@@ -71,7 +71,7 @@ if (!function_exists('localize')) {
                     }
                     $code = array_filter(array_slice($lines, $start, $end - $start + 1, true), 'trim');
                     $max = strlen($end);
-                    $cite->code = implode("\n", array_map(function ($u, $v) use ($max) {
+                    $cite->code = implode("\n", array_map(function($u, $v) use ($max) {
                         return sprintf("%{$max}d\t%s", $u, rtrim($v));
                     }, array_keys($code), $code));
                     $cite->save();
@@ -88,11 +88,11 @@ if (!function_exists('localize')) {
 if (!function_exists('sweep')) {
     function sweep()
     {
-        call_user_func_array(function ($u) {
+        call_user_func_array(function($u) {
             $u->sweep();
         }, config('trans-helper.model.cite')::get()->all());
 
-        call_user_func_array(function ($u) {
+        call_user_func_array(function($u) {
             $u->sweep();
         }, config('trans-helper.model.term')::get()->all());
     }
