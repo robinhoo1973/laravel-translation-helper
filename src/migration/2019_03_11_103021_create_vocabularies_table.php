@@ -19,7 +19,7 @@ class CreateVocabulariesTable extends Migration
     public function up()
     {
         $connection = config('trans-helper.database.connection') ?: config('database.default');
-        Schema::connection($connection)->create(config('trans-helper.database.table.cites'), function(Blueprint $table) {
+        Schema::connection($connection)->create(config('trans-helper.database.table.cite'), function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('file', 256)->default('');
             $table->unsignedBigInteger('line');
@@ -37,7 +37,7 @@ class CreateVocabulariesTable extends Migration
         });
         Schema::connection($connection)->create(
             config('trans-helper.database.table.term'),
-            function(Blueprint $table) {
+            function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->string('namespace', 256)->default('');
                 $table->string('term', 256)->default('');
@@ -54,7 +54,7 @@ class CreateVocabulariesTable extends Migration
 
         Schema::connection($connection)->create(
             config('trans-helper.database.table.link'),
-            function(Blueprint $table) {
+            function (Blueprint $table) {
                 $table->unsignedBigInteger('cited');
                 $table->unsignedBigInteger('vocab');
 
