@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace TopviewDigital\TranslationHelper\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,7 +24,7 @@ class VocabTerm extends Model
     public function cites()
     {
         return $this->belongsToMany(
-            VocabCite::class,
+            config('trans-helper.model.cite'),
             config('trans-helper.database.table.link'),
             'vocab',
             'cited',

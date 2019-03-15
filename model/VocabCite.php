@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace TopviewDigital\TranslationHelper\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,7 +21,7 @@ class VocabCite extends Model
     public function terms()
     {
         return $this->belongsToMany(
-            VocabData::class,
+            config('trans-helper.model.term'),
             config('trans-helper.database.table.link'),
             'cited',
             'vocab',
@@ -39,7 +39,7 @@ class VocabCite extends Model
                 'array_merge',
                 array_map(
                     function ($u) {
-                        return ["localize('{$u->term}')", 'localize("'.$u->term.'")'];
+                        return ["localize('{$u->term}')", 'localize("' . $u->term . '")'];
                     },
                     $this->terms()->get()->all()
                 )

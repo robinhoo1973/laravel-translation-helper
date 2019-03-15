@@ -22,21 +22,15 @@ class TranslationHelperServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->loadAdminAuthConfig();
-        $this->registerRouteMiddleware();
         $this->commands($this->commands);
-        $this->publishAssets();
     }
 
     private function publishAssets()
     {
         $this->publishes(
-            [dirname(__DIR__).'/config' => config_path()],
-            'translation-helper-config'
-        );
-        $this->publishes(
-            [__DIR__.'/../database/migrations' => database_path('migrations')],
-            'translation-helper-migrations'
+            [
+                dirname(__DIR__) . '/config/trans-helper.php' => config_path('trans-helper.php'),
+            ]
         );
     }
 
@@ -45,6 +39,7 @@ class TranslationHelperServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->loadMigrationsFrom(dirname(__DIR__) . '/migration');
         if ($this->app->runningInConsole()) {
             $this->publishAssets();
         }
