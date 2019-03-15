@@ -38,13 +38,13 @@ class VocabCite extends Model
             $terms = call_user_func_array(
                 'array_merge',
                 array_map(
-                    function ($u) {
-                        return ["localize('{$u->term}')", 'localize("'.$u->term.'")'];
+                    function($u) {
+                        return ["localize('{$u->term}')", 'localize("' . $u->term . '")'];
                     },
                     $this->terms()->get()->all()
                 )
             );
-            $matched = array_filter(array_map(function ($u) use ($line) {
+            $matched = array_filter(array_map(function($u) use ($line) {
                 return strpos($line, $u);
             }, $terms), 'strlen');
 
