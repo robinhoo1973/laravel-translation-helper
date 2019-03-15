@@ -32,7 +32,7 @@ class VocabCite extends Model
 
     public function sweep()
     {
-        $line = explode("\n", file_get_contents($this->file));
+        $line = explode("\n", file_get_contents(base_path() . $this->file));
         $line = $line[$this->line - 1] ?? '';
         if ($line) {
             $terms = call_user_func_array(
