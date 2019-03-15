@@ -36,7 +36,7 @@ class CreateVocabulariesTable extends Migration
             $table->index('class', 'class');
         });
         Schema::connection($connection)->create(
-            config('trans-helper.database.database.table.term'),
+            config('trans-helper.database.table.term'),
             function(Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->string('namespace', 256)->default('');
@@ -53,7 +53,7 @@ class CreateVocabulariesTable extends Migration
         );
 
         Schema::connection($connection)->create(
-            config('trans-helper.database.database.table.link'),
+            config('trans-helper.database.table.link'),
             function(Blueprint $table) {
                 $table->unsignedBigInteger('cited');
                 $table->unsignedBigInteger('vocab');
@@ -63,11 +63,11 @@ class CreateVocabulariesTable extends Migration
                 $table->index('vocab', 'vocab');
                 $table->foreign('cited')
                     ->references('id')
-                    ->on(config('trans-helper.database.database.table.cite'))
+                    ->on(config('trans-helper.database.table.cite'))
                     ->onDelete('cascade');
                 $table->foreign('vocab')
                     ->references('id')
-                    ->on(config('trans-helper.database.database.table.term'))
+                    ->on(config('trans-helper.database.table.term'))
                     ->onDelete('cascade');
             }
         );
