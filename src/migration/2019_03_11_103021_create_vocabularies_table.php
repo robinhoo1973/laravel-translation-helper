@@ -41,7 +41,7 @@ class CreateVocabulariesTable extends Migration
                 $table->bigIncrements('id');
                 $table->string('namespace', 256)->default('');
                 $table->string('term', 256)->default('');
-                $table->json('translation');
+                $table->json('translation')->nullable();
                 $table->timestamps();
 
                 $table->unique(['namespace', 'term'], 'unique_namespace_term');
