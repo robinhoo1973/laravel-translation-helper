@@ -86,16 +86,19 @@ if (!function_exists('localize')) {
     }
 }
 
+
 if (!function_exists('sweep')) {
     function sweep()
     {
-        call_user_func_array(function ($u) {
-            $u->sweep();
-        }, config('trans-helper.model.cite')::get()->all());
-
-        call_user_func_array(function ($u) {
-            $u->sweep();
-        }, config('trans-helper.model.term')::get()->all());
+        array_map(
+            function ($u) {
+                $u->sweep();
+            },
+            array_merge(
+                config('trans-helper.model.cite')::get()->all(),
+                config('trans-helper.model.term')::get()->all()
+            )
+        );
     }
 }
 
