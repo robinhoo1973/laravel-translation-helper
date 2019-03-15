@@ -35,11 +35,11 @@ class VocabCite extends Model
         $line = explode("\n", file_get_contents($this->file));
         $line = $line[$this->line] ?? '';
         if ($line) {
-            $terms  = call_user_func_array(
+            $terms = call_user_func_array(
                 'array_merge',
                 array_map(
                     function ($u) {
-                        return ["localize('{$u->term}')", 'localize("' . $u->term . '")'];
+                        return ["localize('{$u->term}')", 'localize("'.$u->term.'")'];
                     },
                     $this->terms()->get()->all()
                 )

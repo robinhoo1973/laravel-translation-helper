@@ -1,4 +1,5 @@
 <?php
+
 namespace TopviewDigital\TranslationHelper\Console;
 
 use Illuminate\Console\Command;
@@ -23,6 +24,7 @@ class InstallCommand extends Command
      * @var string
      */
     protected $directory = '';
+
     /**
      * Execute the console command.
      *
@@ -32,6 +34,7 @@ class InstallCommand extends Command
     {
         $this->initDatabase();
     }
+
     /**
      * Create tables and seed it.
      *

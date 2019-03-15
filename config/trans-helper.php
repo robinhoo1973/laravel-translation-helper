@@ -1,4 +1,5 @@
 <?php
+
 return [
 
     /*
@@ -14,10 +15,10 @@ return [
         'connection' => '',
         // Vocabulary data tables and model.
         'table' => [
-            'term' =>  '_vocab_terms',
+            'term' => '_vocab_terms',
             'cite' => '_vocab_cites',
             'link' => '_voca_links',
-        ]
+        ],
     ],
     /*
     |--------------------------------------------------------------------------
@@ -32,5 +33,5 @@ return [
     'model' => [
         'term' => TopviewDigital\TranslationHelper\Model\VocabTerm::class,
         'cite' => TopviewDigital\TranslationHelper\Model\VocabCite::class,
-    ]
+    ],
 ];
