@@ -29,7 +29,7 @@ class TranslationHelperServiceProvider extends ServiceProvider
     {
         $this->publishes(
             [
-                dirname(__DIR__) . '/config/trans-helper.php' => config_path('trans-helper.php'),
+                dirname(__DIR__).'/config/trans-helper.php' => config_path('trans-helper.php'),
             ]
         );
     }
@@ -39,7 +39,7 @@ class TranslationHelperServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadMigrationsFrom(dirname(__DIR__) . '/migration');
+        $this->loadMigrationsFrom(dirname(__DIR__).'/migration');
         if ($this->app->runningInConsole()) {
             $this->publishAssets();
         }
