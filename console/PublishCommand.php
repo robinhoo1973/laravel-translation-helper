@@ -1,4 +1,5 @@
 <?php
+
 namespace TopviewDigital\TranslationHelper\Console;
 
 use Illuminate\Console\Command;
@@ -17,6 +18,7 @@ class PublishCommand extends Command
      * @var string
      */
     protected $description = "publish translation helper's assets, configuration, config and migration files. If you want overwrite the existing files, you can add the `--force` option";
+
     /**
      * Execute the console command.
      *

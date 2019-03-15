@@ -1,4 +1,5 @@
 <?php
+
 namespace TopviewDigital\TranslationHelper\Console;
 
 use Illuminate\Console\Command;
@@ -23,6 +24,7 @@ class SweepCommand extends Command
      * @var string
      */
     protected $directory = '';
+
     /**
      * Execute the console command.
      *

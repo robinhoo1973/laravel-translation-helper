@@ -31,14 +31,15 @@ class TranslationHelperServiceProvider extends ServiceProvider
     private function publishAssets()
     {
         $this->publishes(
-            [dirname(__DIR__) . '/config' => config_path()],
+            [dirname(__DIR__).'/config' => config_path()],
             'translation-helper-config'
         );
         $this->publishes(
-            [__DIR__ . '/../database/migrations' => database_path('migrations')],
+            [__DIR__.'/../database/migrations' => database_path('migrations')],
             'translation-helper-migrations'
         );
     }
+
     /**
      * {@inheritdoc}
      */

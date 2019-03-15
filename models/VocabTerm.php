@@ -2,7 +2,6 @@
 
 namespace App\Model;
 
-use App\Model\VocaCite;
 use Illuminate\Database\Eloquent\Model;
 
 class VocabTerm extends Model
