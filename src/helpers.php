@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Str;
 use TopviewDigital\TranslationHelper\Model\VocabTerm;
 use TopviewDigital\TranslationHelper\Model\VocabCite;
 use TopviewDigital\TranslationHelper\Service\Translation;
@@ -151,6 +152,15 @@ if (!function_exists('slugify')) {
         return $text;
     }
 }
+if (!function_exists('lang_file_name')) {
+    function lang_file_name($path, $locale, $namespace)
+    {
+        $lang_file = str_replace('/', '.', strtolower(ltrim(Str::snake($namespace), '/')));
+        $lang_file = str_replace('//', '/', implode('/', [$path, $locale, $lang_file]));
+        $lang_file = str_replace('._', '.', $lang_file) . '.php';
+        return $lang_file;
+    }
+}
 
 if (!function_exists('export')) {
     function export($path = null)
@@ -161,14 +171,13 @@ if (!function_exists('export')) {
         foreach ($namespaces as $namespace) {
             foreach ($locales as $locale) {
                 if (file_exists($path . '/' . $locale) && !is_dir($path . '/' . $locale)) {
-                    unlink($path . '/ ' . $locale);
+                    unlink($path . '/' . $locale);
                 }
-                if (!file_exists($path . ' / ' . $locale)) {
-                    mkdir($path . ' / ' . $locale, 077, true);
+                if (!file_exists($path . '/' . $locale)) {
+                    mkdir($path . '/' . $locale, 0777, true);
                 }
+                $lang_file = lang_file_name($path, $locale, $namespace);
 
-                $langue_file = str_replace('/', '.', strtolower(ltrim($namespace, '/')));
-                $langue_file = str_replace('//', '/', implode('/', [$path, $locale, $langue_file]));
                 $lines = ['<?php', '', 'return ['];
                 foreach (VocabTerm::where('namespace', $namespace)->get() as $term) {
                     $lines[] = sprintf(
@@ -177,8 +186,8 @@ if (!function_exists('export')) {
                         localize($term->translation, $term->translation[config('app.locale')])
                     );
                 }
-                $lines[] = '];';
-                file_put_contents($langue_file, implode("\n", $lines));
+                $lines[] = "];\n";
+                file_put_contents($lang_file, implode("\n", $lines));
             }
         }
     }
