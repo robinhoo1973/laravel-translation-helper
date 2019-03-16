@@ -2,13 +2,13 @@
 
 namespace TopviewDigital\TranslationHelper\Queue;
 
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Campo\UserAgent;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use TopviewDigital\TranslationHelper\Model\VocabTerm;
-use Campo\UserAgent;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Stichoza\GoogleTranslate\GoogleTranslate;
+use TopviewDigital\TranslationHelper\Model\VocabTerm;
 
 class Translation extends Job implements SelfHandling, ShouldQueue
 {
@@ -26,7 +26,7 @@ class Translation extends Job implements SelfHandling, ShouldQueue
                 app()->getLocale(),
                 config('app.locale'),
                 config('app.fallback_locale'),
-                config('app.faker_locale')
+                config('app.faker_locale'),
             ])
         );
         $this->term = $term;
@@ -48,11 +48,11 @@ class Translation extends Job implements SelfHandling, ShouldQueue
     {
         sleep(1);
         $this->called++;
+
         return [
-            'headers' =>
-            [
-                'User-Agent' => UserAgent::random()
-            ]
+            'headers' => [
+                'User-Agent' => UserAgent::random(),
+            ],
         ];
     }
 
@@ -61,6 +61,7 @@ class Translation extends Job implements SelfHandling, ShouldQueue
         $row = 0;
         while ($row < 1) {
             $this->called = 0;
+
             try {
                 $language = new GoogleTranslate();
                 $translation = $term->translation;

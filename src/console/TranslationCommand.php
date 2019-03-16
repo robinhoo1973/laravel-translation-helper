@@ -4,7 +4,7 @@ namespace TopviewDigital\TranslationHelper\Console;
 
 use Illuminate\Console\Command;
 
-class SweepCommand extends Command
+class TranslationCommand extends Command
 {
     /**
      * The console command name.
