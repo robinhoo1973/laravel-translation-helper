@@ -13,6 +13,8 @@ class TranslationHelperServiceProvider extends ServiceProvider
         Console\InstallCommand::class,
         Console\PublishCommand::class,
         Console\SweepCommand::class,
+        Console\TranslationCommand::class,
+        Console\ExportCommand::class,
     ];
 
     /**
@@ -29,7 +31,7 @@ class TranslationHelperServiceProvider extends ServiceProvider
     {
         $this->publishes(
             [
-                __DIR__.'/config/trans-helper.php' => config_path('trans-helper.php'),
+                __DIR__ . '/config/trans-helper.php' => config_path('trans-helper.php'),
             ]
         );
     }
@@ -39,7 +41,7 @@ class TranslationHelperServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadMigrationsFrom(__DIR__.'/migration');
+        $this->loadMigrationsFrom(__DIR__ . '/migration');
         if ($this->app->runningInConsole()) {
             $this->publishAssets();
         }

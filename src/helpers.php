@@ -1,6 +1,6 @@
 <?php
 
-use TopviewDigital\TranslationHelper\Queue\Translation;
+use TopviewDigital\TranslationHelper\Service\Translation;
 
 if (!function_exists('is_json')) {
     function is_json($string)
@@ -14,6 +14,13 @@ if (!function_exists('is_json')) {
     }
 }
 
+if (!function_exists('auto_trans_able')) {
+    function auto_trans_able()
+    {
+        return config('trans-helper.translation.mode') == 'auto'
+            && config('queue.default') != 'sync';
+    }
+}
 if (!function_exists('localize')) {
     function localize($languages, string $failback = '')
     {
@@ -42,23 +49,23 @@ if (!function_exists('localize')) {
                 $cite['file']
             );
             $vocab['term'] = $languages;
-            $vocab = config('trans-helper.model.term')::firstOrCreate($vocab);
+            $vocab = VocabTerm::firstOrCreate($vocab);
             if (!$vocab->transaltion) {
                 $vocab->translation = [config('app.locale') => $vocab['term']];
                 $vocab->save();
+                if (auto_trans_able()) {
+                    dispatch(new Translation($vocab));
+                }
             }
-            if (
-                config('trans-helper.translation.mode') == 'auto'
-                && !in_array(app()->getLocale(), array_keys($vocab->translation))
-            ) {
-                Translation::dispatch($vocab, [app()->getLocale()])->onQueue('tranlsation');
+            if (auto_trans_able() && !in_array(app()->getLocale(), array_keys($vocab->translation))) {
+                dispatch(new Translation($vocab, [app()->getLocale()]));
             }
             $cite['file'] = preg_replace(
                 '/^' . addcslashes(base_path(), '\/') . '/',
                 '',
                 $cite['file']
             );
-            $cite = config('trans-helper.model.cite')::firstOrCreate($cite);
+            $cite = VocabCite::firstOrCreate($cite);
             $vocab->cites()->sync([$cite->id], false);
             if (!$cite->code) {
                 $lines = explode("\n", file_get_contents(base_path() . $cite->file));
@@ -102,8 +109,8 @@ if (!function_exists('sweep')) {
                 $u->sweep();
             },
             array_merge(
-                config('trans-helper.model.cite')::get()->all(),
-                config('trans-helper.model.term')::get()->all()
+                VocabCite::get()->all(),
+                VocabTerm::get()->all()
             )
         );
     }
@@ -112,6 +119,67 @@ if (!function_exists('sweep')) {
 if (!function_exists('translate')) {
     function translate($locales = [])
     {
-        Translation::dispatch(null, $locales)->onQueue('tranlsation');
+        dispatch(new Translation(null, $locales));
     }
 }
+if (!function_exists('slugify')) {
+    function slugify($text)
+    {
+        // replace non letter or digits by -
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+
+        // transliterate
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+        // remove unwanted characters
+        $text = preg_replace('~[^-\w]+~', '', $text);
+
+        // trim
+        $text = trim($text, '-');
+
+        // remove duplicated - symbols
+        $text = preg_replace('~-+~', '-', $text);
+
+        // lowercase
+        $text = strtolower($text);
+
+        if (empty($text)) {
+            return 'n-a';
+        }
+
+        return $text;
+    }
+}
+
+if (!function_exists('export')) {
+    function export($path = null)
+    {
+        $path = $path ?? config('trans-helper.export.path');
+        $locales = VocabTerm::locales();
+        $namespaces = VocabTerm::namespaces();
+        foreach ($namespaces as $namespace) {
+            foreach ($locales as $locale) {
+                $langue_file=str_replace('/', '.', strtolower(ltrim($namespace,'/')));
+                $langue_file = str_replace('//', '/', implode('/',[$path,$locale,$langue_file]));
+                $lines=['<?php','','return ['];
+                foreach (VocabTerm::where('namespace', $namespace)->get() as $term) {
+                        $lines[]=sprintf("    '%s'=>'%s',",
+                        $term->slug,
+                        localize($term->translation,$term->translation[config('app.locale')]));
+                }
+                $lines[]='];';
+                file_put_contents($langue_file,implode("\n",$lines));
+            }
+        }
+    }
+}
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

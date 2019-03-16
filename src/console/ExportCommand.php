@@ -4,20 +4,20 @@ namespace TopviewDigital\TranslationHelper\Console;
 
 use Illuminate\Console\Command;
 
-class TranslationCommand extends Command
+class ExportCommand extends Command
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $signature = 'trans-helper:trans';
+    protected $signature = 'trans-helper:export';
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Translation existing terms after sweep';
+    protected $description = 'Export translated terms into language files';
     /**
      * Install directory.
      *
@@ -32,6 +32,7 @@ class TranslationCommand extends Command
      */
     public function handle()
     {
-        translation();
+        sweep();
+        export();
     }
 }

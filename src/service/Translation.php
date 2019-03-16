@@ -1,6 +1,6 @@
 <?php
 
-namespace TopviewDigital\TranslationHelper\Queue;
+namespace TopviewDigital\TranslationHelper\Service;
 
 use Campo\UserAgent;
 use Illuminate\Bus\Queueable;
@@ -17,13 +17,13 @@ class Translation implements ShouldQueue
 
     protected $break = 0;
     protected $term;
-    protected $locale;
+    protected $locales;
     protected $translation;
 
-    public function __construct(VocabTerm $term = null, array $locale = [])
+    public function __construct(VocabTerm $term = null, array $locales = [])
     {
-        $this->locale = array_unique(
-            array_merge($locale, [
+        $this->locales = array_unique(
+            array_merge($locales, [
                 app()->getLocale(),
                 config('app.locale'),
                 config('app.fallback_locale'),
@@ -38,7 +38,7 @@ class Translation implements ShouldQueue
         if (empty($this->term)) {
             sweep();
             array_map(function ($u) {
-                self::dispatch($u, $this->locales)->onQueue('translation');
+                $this->translation($u, $this->locales);
             }, VocabTerm::get()->all());
         } else {
             $this->translation($this->term);

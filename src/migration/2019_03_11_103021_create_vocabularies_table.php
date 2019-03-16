@@ -19,59 +19,68 @@ class CreateVocabulariesTable extends Migration
     public function up()
     {
         $connection = config('trans-helper.database.connection') ?: config('database.default');
-        Schema::connection($connection)->create(config('trans-helper.database.table.cite'), function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('file', 256)->default('');
-            $table->unsignedBigInteger('line');
-            $table->string('class', 256)->nullable();
-            $table->string('function', 256)->nullable();
-            $table->mediumText('code')->nullable();
-            $table->timestamps();
+        if (!Schema::connection($connection)->hasTable('_trans_helper_cites')) {
+            Schema::connection($connection)->create(
+                '_trans_helper_cites',
+                function (Blueprint $table) {
+                    $table->bigIncrements('id');
+                    $table->string('file', 256)->default('');
+                    $table->unsignedBigInteger('line');
+                    $table->string('class', 256)->nullable();
+                    $table->string('function', 256)->nullable();
+                    $table->mediumText('code')->nullable();
+                    $table->timestamps();
 
-            $table->index('created_at', 'created_at');
-            $table->index('updated_at', 'updated_at');
-            $table->index('function', 'function');
-            $table->index('file', 'file');
-            $table->index('line', 'line');
-            $table->index('class', 'class');
-        });
+                    $table->index('created_at', 'created_at');
+                    $table->index('updated_at', 'updated_at');
+                    $table->index('function', 'function');
+                    $table->index('file', 'file');
+                    $table->index('line', 'line');
+                    $table->index('class', 'class');
+                }
+            );
+        }
 
-        Schema::connection($connection)->create(
-            config('trans-helper.database.table.term'),
-            function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->string('namespace', 256)->default('');
-                $table->string('term', 256)->default('');
-                $table->json('translation')->nullable();
-                $table->timestamps();
+        if (!Schema::connection($connection)->hasTable('_trans_helper_terms')) {
+            Schema::connection($connection)->create(
+                '_trans_helper_terms',
+                function (Blueprint $table) {
+                    $table->bigIncrements('id');
+                    $table->string('namespace', 256)->default('');
+                    $table->string('term', 256)->default('');
+                    $table->json('translation')->nullable();
+                    $table->timestamps();
 
-                $table->unique(['namespace', 'term'], 'unique_namespace_term');
-                $table->index('namespace', 'namespace');
-                $table->index('term', 'term');
-                $table->index('created_at', 'created_at');
-                $table->index('updated_at', 'updated_at');
-            }
-        );
+                    $table->unique(['namespace', 'term'], 'unique_namespace_term');
+                    $table->index('namespace', 'namespace');
+                    $table->index('term', 'term');
+                    $table->index('created_at', 'created_at');
+                    $table->index('updated_at', 'updated_at');
+                }
+            );
+        }
 
-        Schema::connection($connection)->create(
-            config('trans-helper.database.table.link'),
-            function (Blueprint $table) {
-                $table->unsignedBigInteger('cited');
-                $table->unsignedBigInteger('vocab');
+        if (!Schema::connection($connection)->hasTable('_trans_helper_links')) {
+            Schema::connection($connection)->create(
+                '_trans_helper_links',
+                function (Blueprint $table) {
+                    $table->unsignedBigInteger('cited');
+                    $table->unsignedBigInteger('vocab');
 
-                $table->primary(['cited', 'vocab']);
-                $table->index('cited', 'cited');
-                $table->index('vocab', 'vocab');
-                $table->foreign('cited')
-                    ->references('id')
-                    ->on(config('trans-helper.database.table.cite'))
-                    ->onDelete('cascade');
-                $table->foreign('vocab')
-                    ->references('id')
-                    ->on(config('trans-helper.database.table.term'))
-                    ->onDelete('cascade');
-            }
-        );
+                    $table->primary(['cited', 'vocab']);
+                    $table->index('cited', 'cited');
+                    $table->index('vocab', 'vocab');
+                    $table->foreign('cited')
+                        ->references('id')
+                        ->on('_trans_helper_cites')
+                        ->onDelete('cascade');
+                    $table->foreign('vocab')
+                        ->references('id')
+                        ->on('_trans_helper_terms')
+                        ->onDelete('cascade');
+                }
+            );
+        }
     }
 
     /**
@@ -82,8 +91,8 @@ class CreateVocabulariesTable extends Migration
     public function down()
     {
         $connection = config('trans-helper.database.connection') ?: config('database.default');
-        Schema::connection($connection)->dropIfExists(config('trans-helper.database.table.link'));
-        Schema::connection($connection)->dropIfExists(config('trans-helper.database.table.cite'));
-        Schema::connection($connection)->dropIfExists(config('trans-helper.database.table.term'));
+        Schema::connection($connection)->dropIfExists('_trans_helper_links');
+        Schema::connection($connection)->dropIfExists('_trans_helper_cites');
+        Schema::connection($connection)->dropIfExists('_trans_helper_terms');
     }
 }

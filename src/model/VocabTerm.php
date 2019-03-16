@@ -33,10 +33,38 @@ class VocabTerm extends Model
         );
     }
 
+    public function getSlugAttribute($attr)
+    {
+        $key = slugify($this->translation['en']);
+        $key = strlen($key) > 20 ? substr($key, 0, 20) : $key;
+        $key .= '_' . substr(uniqid(), -5);
+        return $key;
+    }
+
     public function sweep()
     {
         if ($this->cites()->count() < 1) {
             $this->delete();
         }
+    }
+
+    public static function namespaces()
+    {
+        return self::distinct('namespace')->pluck('namespace')->toArray();
+    }
+
+    public static function locales()
+    {
+        return array_unique(
+            call_user_func_array(
+                ' array_merge',
+                array_map(
+                    function ($u) {
+                        return array_keys($u->translation);
+                    },
+                    self::get()->all()
+                )
+            )
+        );
     }
 }
