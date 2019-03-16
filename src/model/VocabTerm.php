@@ -17,15 +17,15 @@ class VocabTerm extends Model
     {
         $connection = config('trans-helper.database.connection') ?: config('database.default');
         $this->setConnection($connection);
-        $this->setTable(config('trans-helper.database.table.term'));
+        $this->setTable('_trans_helper_terms');
         parent::__construct($attributes);
     }
 
     public function cites()
     {
         return $this->belongsToMany(
-            config('trans-helper.model.cite'),
-            config('trans-helper.database.table.link'),
+            VocabCite::class,
+            '_trans_helper_links',
             'vocab',
             'cited',
             'id',
@@ -60,7 +60,7 @@ class VocabTerm extends Model
             call_user_func_array(
                 ' array_merge',
                 array_map(
-                    function($u) {
+                    function ($u) {
                         return array_keys($u->translation);
                     },
                     self::get()->all()

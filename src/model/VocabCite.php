@@ -21,7 +21,7 @@ class VocabCite extends Model
     public function terms()
     {
         return $this->belongsToMany(
-            VocabTerm,
+            VocabTerm::class,
             '_trans_helper_links',
             'cited',
             'vocab',
@@ -38,7 +38,7 @@ class VocabCite extends Model
         if ($line) {
             foreach ($this->terms()->get() as $term) {
                 $keywords = ["localize('{$term->term}')", 'localize("' . $term->term . '")'];
-                $matched = array_filter(array_map(function($u) use ($line) {
+                $matched = array_filter(array_map(function ($u) use ($line) {
                     return strpos($line, $u);
                 }, $keywords), 'strlen');
                 if (empty($matched)) {
