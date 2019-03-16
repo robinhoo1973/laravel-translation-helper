@@ -14,11 +14,11 @@ class CreateQueueTables extends Migration
     public function up()
     {
         if (config('queue.default') == 'database') {
-            $connection = config('queue.database.failed.database');
-            if (!Schema::connection($connection)->hasTable(config('queue.database.failed.table'))) {
+            $connection = config('queue.failed.database');
+            if (!Schema::connection($connection)->hasTable(config('queue.failed.table'))) {
                 Schema::connection($connection)->create(
-                    config('queue.database.failed.table'),
-                    function(Blueprint $table) {
+                    config('queue.failed.table'),
+                    function (Blueprint $table) {
                         $table->bigIncrements('id');
                         $table->text('connection');
                         $table->text('queue');
@@ -32,7 +32,7 @@ class CreateQueueTables extends Migration
             if (!Schema::connection($connection)->hasTable(config('queue.connections.database.table'))) {
                 Schema::connection($connection)->create(
                     config('queue.connections.database.table'),
-                    function(Blueprint $table) {
+                    function (Blueprint $table) {
                         $table->bigIncrements('id');
                         $table->string('queue')->index();
                         $table->longText('payload');
@@ -54,9 +54,9 @@ class CreateQueueTables extends Migration
     public function down()
     {
         if (config('queue.default') == 'database') {
-            $connection = config('queue.database.failed.database');
+            $connection = config('queue.failed.database');
             Schema::connection($connection)->dropIfExists(config('queue.connections.database.table'));
-            Schema::connection($connection)->dropIfExists(config('queue.database.failed.table'));
+            Schema::connection($connection)->dropIfExists(config('queue.failed.table'));
         }
     }
 }
