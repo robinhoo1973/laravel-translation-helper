@@ -43,10 +43,7 @@ class InstallCommand extends Command
      */
     public function initDatabase()
     {
-        $connection = config('trans-helper.database.connection') ?: config('database.default');
 
-        if (!Schema::connection($connection)->hasTable(config('trans-helper.database.table.cite'))) {
-            $this->call('migrate');
-        }
+        $this->call('migrate');
     }
 }
