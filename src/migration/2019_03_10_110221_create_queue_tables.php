@@ -18,7 +18,7 @@ class CreateQueueTables extends Migration
             if (!Schema::connection($connection)->hasTable(config('queue.database.failed.table'))) {
                 Schema::connection($connection)->create(
                     config('queue.database.failed.table'),
-                    function (Blueprint $table) {
+                    function(Blueprint $table) {
                         $table->bigIncrements('id');
                         $table->text('connection');
                         $table->text('queue');
@@ -32,7 +32,7 @@ class CreateQueueTables extends Migration
             if (!Schema::connection($connection)->hasTable(config('queue.connections.database.table'))) {
                 Schema::connection($connection)->create(
                     config('queue.connections.database.table'),
-                    function (Blueprint $table) {
+                    function(Blueprint $table) {
                         $table->bigIncrements('id');
                         $table->string('queue')->index();
                         $table->longText('payload');
