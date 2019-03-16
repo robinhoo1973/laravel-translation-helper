@@ -32,6 +32,6 @@ class TranslationCommand extends Command
      */
     public function handle()
     {
-        translation();
+        translate();
     }
 }

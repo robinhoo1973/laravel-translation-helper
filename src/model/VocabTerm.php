@@ -58,7 +58,7 @@ class VocabTerm extends Model
     {
         return array_unique(
             call_user_func_array(
-                ' array_merge',
+                'array_merge',
                 array_map(
                     function ($u) {
                         return array_keys($u->translation);
