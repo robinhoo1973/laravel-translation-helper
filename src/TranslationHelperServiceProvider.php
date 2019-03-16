@@ -32,6 +32,7 @@ class TranslationHelperServiceProvider extends ServiceProvider
                 __DIR__ . '/config/trans-helper.php' => config_path('trans-helper.php'),
             ]
         );
+
     }
 
     /**

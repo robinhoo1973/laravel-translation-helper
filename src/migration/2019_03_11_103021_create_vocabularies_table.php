@@ -35,6 +35,7 @@ class CreateVocabulariesTable extends Migration
             $table->index('line', 'line');
             $table->index('class', 'class');
         });
+
         Schema::connection($connection)->create(
             config('trans-helper.database.table.term'),
             function (Blueprint $table) {

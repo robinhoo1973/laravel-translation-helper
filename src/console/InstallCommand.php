@@ -3,6 +3,7 @@
 namespace TopviewDigital\TranslationHelper\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Schema;
 
 class InstallCommand extends Command
 {
@@ -42,6 +43,12 @@ class InstallCommand extends Command
      */
     public function initDatabase()
     {
-        $this->call('migrate');
+        $connection = config('trans-helper.database.connection') ?: config('database.default');
+        if (!Schema::connection($connection)->hasTable('jobs')) {
+            $this->call('queue:table');
+        }
+        if (!Schema::connection($connection)->hasTable(config('trans-helper.database.table.cite'))) {
+            $this->call('migrate');
+        }
     }
 }

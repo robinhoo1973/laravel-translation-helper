@@ -1,5 +1,7 @@
 <?php
 
+use TopviewDigital\TranslationHelper\Queue\Translation;
+
 if (!function_exists('is_json')) {
     function is_json($string)
     {
@@ -21,9 +23,8 @@ if (!function_exists('localize')) {
             $system = \App::getLocale();
             $default = config('app.locale');
 
-            return in_array($system, $locales)
-                ? $languages[$system]
-                : (in_array($default, $locales) ? $languages[$default] : $failback);
+            $locale = in_array($system, $locales) ? $system : (in_array($default, $locales) ? $default : null);
+            return  $locale ? $languages[$locale] : $failback;
         }
         if (is_string($languages) && empty($failback)) {
             $tracer = (new Exception())->getTrace();
@@ -31,8 +32,8 @@ if (!function_exists('localize')) {
             $cite['file'] = preg_replace('/(\.php)(.+)$/', '${1}', $tracer[0]['file']);
             $cite['line'] = $tracer[0]['line'];
             array_shift($tracer);
-            $cite['function'] = array_key_exists('function', $tracer[0]) ? $tracer[0]['line'] : '';
-            $cite['class'] = array_key_exists('class', $tracer[0]) ? $tracer[0]['line'] : '';
+            $cite['function'] = $tracer[0]['function'] ?? '';
+            $cite['class'] = $tracer[0]['class'] ?? '';
             $vocab = [];
             $vocab['namespace'] = preg_replace(
                 '/(^' . addcslashes(base_path(), '\/') . ')|(\.php$)/',
@@ -44,6 +45,13 @@ if (!function_exists('localize')) {
             if (!$vocab->transaltion) {
                 $vocab->translation = [config('app.locale') => $vocab['term']];
                 $vocab->save();
+                if (
+                    !in_array(app()->getLocale(), $locales)
+                    &&
+                    config('trans-helper.translation.mode') == 'auto'
+                ) {
+                    Translation::dispatch($vocab, [app()->getLocale()])->onQueue('tranlsation');
+                }
             }
             $cite['file'] = preg_replace(
                 '/^' . addcslashes(base_path(), '\/') . '/',
@@ -103,8 +111,8 @@ if (!function_exists('sweep')) {
 }
 
 if (!function_exists('translate')) {
-    function translate($locales)
+    function translate($locales = null)
     {
-        sweep();
+        Translation::dispatch(null, $locales)->onQueue('tranlsation');
     }
 }

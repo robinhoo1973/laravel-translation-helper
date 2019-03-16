@@ -20,6 +20,7 @@ return [
             'link' => '_voca_links',
         ],
     ],
+
     /*
     |--------------------------------------------------------------------------
     | Laravel-Translation-Helper Model Settings
@@ -34,4 +35,19 @@ return [
         'term' => TopviewDigital\TranslationHelper\Model\VocabTerm::class,
         'cite' => TopviewDigital\TranslationHelper\Model\VocabCite::class,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Laravel-Translation-Helper Translation Settings
+    |--------------------------------------------------------------------------
+    |
+    | Here are database settings for Laravel-Translation-Helper builtin model & tables.
+    |
+    */
+
+    // Vocabulary data tables and model.
+    'translation' => [
+        'mode' => 'auto', //auto,manual,off
+    ],
+
 ];
