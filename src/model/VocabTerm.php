@@ -36,9 +36,6 @@ class VocabTerm extends Model
     public function getSlugAttribute($attr)
     {
         $key = slugify($this->translation['en']);
-        $key = strlen($key) > 20 ? substr($key, 0, 20) : $key;
-        $key .= '_' . substr(uniqid(), -5);
-
         return $key;
     }
 

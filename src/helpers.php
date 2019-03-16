@@ -152,6 +152,22 @@ if (!function_exists('slugify')) {
         return $text;
     }
 }
+
+if (function_exists('unique_slugs')) {
+    function unique_slugs($slugs)
+    {
+        $keys = array_keys($slugs);
+        $slugs = array_values($slugs);
+        $slugs = array_map(function ($k, $v) use ($slugs) {
+            if ($k > 0 && in_array($v, array_slice($slugs, 0, $k - 1))) {
+                $v .= '-' . uniqid();
+            }
+            return $v;
+        }, array_keys($slugs), $slugs);
+        return array_combine($keys, $slugs);
+    }
+}
+
 if (!function_exists('lang_file_name')) {
     function lang_file_name($path, $locale, $namespace)
     {
@@ -170,23 +186,30 @@ if (!function_exists('export')) {
         $namespaces = VocabTerm::namespaces();
         foreach ($namespaces as $namespace) {
             foreach ($locales as $locale) {
-                if (file_exists($path . '/' . $locale) && !is_dir($path . '/' . $locale)) {
-                    unlink($path . '/' . $locale);
-                }
-                if (!file_exists($path . '/' . $locale)) {
-                    mkdir($path . '/' . $locale, 0777, true);
-                }
                 $lang_file = lang_file_name($path, $locale, $namespace);
-
-                $lines = ['<?php', '', 'return ['];
-                foreach (VocabTerm::where('namespace', $namespace)->get() as $term) {
-                    $lines[] = sprintf(
-                        "    '%s'=>'%s',",
-                        $term->slug,
-                        localize($term->translation, $term->translation[config('app.locale')])
-                    );
+                $lang_dir = dirname($lang_file);
+                if (file_exists($lang_dir) && !is_dir($lang_dir)) {
+                    unlink($lang_dir);
                 }
+                if (!file_exists($lang_dir)) {
+                    mkdir($lang_dir, 0777, true);
+                }
+
+                $slugs = [];
+                $terms = [];
+                foreach (VocabTerm::where('namespace', $namespace)->get() as $term) {
+                    $slugs[] = $term->slug;
+                    $terms[] = $term->translation[$locale] ?? $term->translation[config('app.locale')];
+                }
+                $slugs = unique_slugs($slugs);
+                $max = intdiv(max(array_map('strlen', $slugs)) + 3, 4) * 4;
+                $lines = array_map(function ($u, $v) use ($max) {
+                    $u = "'{$u}'";
+                    return sprintf("    %{$max}s => '%s',", $u, $v);
+                }, $slugs, $terms);
                 $lines[] = "];\n";
+                array_unshift($lines, 'return [');
+                array_unshift($lines, '<?php');
                 file_put_contents($lang_file, implode("\n", $lines));
             }
         }
