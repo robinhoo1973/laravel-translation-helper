@@ -153,7 +153,7 @@ if (!function_exists('slugify')) {
     }
 }
 
-if (function_exists('unique_slugs')) {
+if (!function_exists('unique_slugs')) {
     function unique_slugs($slugs)
     {
         $keys = array_keys($slugs);
@@ -205,10 +205,10 @@ if (!function_exists('export')) {
                 $max = intdiv(max(array_map('strlen', $slugs)) + 3, 4) * 4;
                 $lines = array_map(function ($u, $v) use ($max) {
                     $u = "'{$u}'";
-                    return sprintf("    %{$max}s => '%s',", $u, $v);
+                    return sprintf("    %-{$max}s => '%s',", $u, $v);
                 }, $slugs, $terms);
                 $lines[] = "];\n";
-                array_unshift($lines, 'return [');
+                array_unshift($lines, "\nreturn [");
                 array_unshift($lines, '<?php');
                 file_put_contents($lang_file, implode("\n", $lines));
             }
