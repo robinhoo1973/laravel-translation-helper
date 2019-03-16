@@ -37,7 +37,7 @@ class VocabTerm extends Model
     {
         $key = slugify($this->translation['en']);
         $key = strlen($key) > 20 ? substr($key, 0, 20) : $key;
-        $key .= '_'.substr(uniqid(), -5);
+        $key .= '_' . substr(uniqid(), -5);
 
         return $key;
     }
@@ -60,7 +60,7 @@ class VocabTerm extends Model
             call_user_func_array(
                 ' array_merge',
                 array_map(
-                    function ($u) {
+                    function($u) {
                         return array_keys($u->translation);
                     },
                     self::get()->all()

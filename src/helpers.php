@@ -26,7 +26,7 @@ if (!function_exists('localize')) {
     function localize($languages, string $failback = '')
     {
         if (is_array($languages) || is_json($languages)) {
-            $languages = (!is_array($languages)) ? (array) json_decode($languages) : $languages;
+            $languages = (!is_array($languages)) ? (array)json_decode($languages) : $languages;
             $locales = array_keys($languages);
             $system = \App::getLocale();
             $default = config('app.locale');
@@ -45,7 +45,7 @@ if (!function_exists('localize')) {
             $cite['class'] = $tracer[0]['class'] ?? '';
             $vocab = [];
             $vocab['namespace'] = preg_replace(
-                '/(^'.addcslashes(base_path(), '\/').')|(\.php$)/',
+                '/(^' . addcslashes(base_path(), '\/') . ')|(\.php$)/',
                 '',
                 $cite['file']
             );
@@ -62,14 +62,14 @@ if (!function_exists('localize')) {
                 dispatch(new Translation($vocab, [app()->getLocale()]));
             }
             $cite['file'] = preg_replace(
-                '/^'.addcslashes(base_path(), '\/').'/',
+                '/^' . addcslashes(base_path(), '\/') . '/',
                 '',
                 $cite['file']
             );
             $cite = VocabCite::firstOrCreate($cite);
             $vocab->cites()->sync([$cite->id], false);
             if (!$cite->code) {
-                $lines = explode("\n", file_get_contents(base_path().$cite->file));
+                $lines = explode("\n", file_get_contents(base_path() . $cite->file));
                 $cite->code = $lines[$cite->line - 1];
                 if (substr($cite->file, -10) != '.blade.php') {
                     for ($start = $cite->line - 2; $start > -1; $start--) {
@@ -88,7 +88,7 @@ if (!function_exists('localize')) {
                     }
                     $code = array_filter(array_slice($lines, $start, $end - $start + 1, true), 'trim');
                     $max = strlen($end);
-                    $cite->code = implode("\n", array_map(function ($u, $v) use ($max) {
+                    $cite->code = implode("\n", array_map(function($u, $v) use ($max) {
                         return sprintf("%{$max}d    %s", $u + 1, rtrim($v));
                     }, array_keys($code), $code));
                     $cite->save();
@@ -106,7 +106,7 @@ if (!function_exists('sweep')) {
     function sweep()
     {
         array_map(
-            function ($u) {
+            function($u) {
                 $u->sweep();
             },
             array_merge(

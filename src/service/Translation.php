@@ -37,7 +37,7 @@ class Translation implements ShouldQueue
     {
         if (empty($this->term)) {
             sweep();
-            array_map(function ($u) {
+            array_map(function($u) {
                 $this->translation($u, $this->locales);
             }, VocabTerm::get()->all());
         } else {
