@@ -3,16 +3,17 @@
 namespace TopviewDigital\TranslationHelper\Queue;
 
 use Campo\UserAgent;
-use Illuminate\Contracts\Bus\SelfHandling;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 use TopviewDigital\TranslationHelper\Model\VocabTerm;
 
-class Translation extends Job implements SelfHandling, ShouldQueue
+class Translation implements ShouldQueue
 {
-    use InteractsWithQueue, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $break = 0;
     protected $term;

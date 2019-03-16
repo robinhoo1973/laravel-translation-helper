@@ -18,7 +18,7 @@ if (!function_exists('localize')) {
     function localize($languages, string $failback = '')
     {
         if (is_array($languages) || is_json($languages)) {
-            $languages = (!is_array($languages)) ? (array) json_decode($languages) : $languages;
+            $languages = (!is_array($languages)) ? (array)json_decode($languages) : $languages;
             $locales = array_keys($languages);
             $system = \App::getLocale();
             $default = config('app.locale');
@@ -37,7 +37,7 @@ if (!function_exists('localize')) {
             $cite['class'] = $tracer[0]['class'] ?? '';
             $vocab = [];
             $vocab['namespace'] = preg_replace(
-                '/(^'.addcslashes(base_path(), '\/').')|(\.php$)/',
+                '/(^' . addcslashes(base_path(), '\/') . ')|(\.php$)/',
                 '',
                 $cite['file']
             );
@@ -46,23 +46,22 @@ if (!function_exists('localize')) {
             if (!$vocab->transaltion) {
                 $vocab->translation = [config('app.locale') => $vocab['term']];
                 $vocab->save();
-                if (
-                    !in_array(app()->getLocale(), $locales)
-                    &&
-                    config('trans-helper.translation.mode') == 'auto'
-                ) {
-                    Translation::dispatch($vocab, [app()->getLocale()])->onQueue('tranlsation');
-                }
+            }
+            if (
+                config('trans-helper.translation.mode') == 'auto'
+                && !in_array(app()->getLocale(), array_keys($vocab->translation))
+            ) {
+                Translation::dispatch($vocab, [app()->getLocale()])->onQueue('tranlsation');
             }
             $cite['file'] = preg_replace(
-                '/^'.addcslashes(base_path(), '\/').'/',
+                '/^' . addcslashes(base_path(), '\/') . '/',
                 '',
                 $cite['file']
             );
             $cite = config('trans-helper.model.cite')::firstOrCreate($cite);
             $vocab->cites()->sync([$cite->id], false);
             if (!$cite->code) {
-                $lines = explode("\n", file_get_contents(base_path().$cite->file));
+                $lines = explode("\n", file_get_contents(base_path() . $cite->file));
                 $cite->code = $lines[$cite->line - 1];
                 if (substr($cite->file, -10) != '.blade.php') {
                     for ($start = $cite->line - 2; $start > -1; $start--) {
@@ -111,7 +110,7 @@ if (!function_exists('sweep')) {
 }
 
 if (!function_exists('translate')) {
-    function translate($locales = null)
+    function translate($locales = [])
     {
         Translation::dispatch(null, $locales)->onQueue('tranlsation');
     }
