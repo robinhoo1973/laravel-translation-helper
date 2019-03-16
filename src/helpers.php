@@ -1,5 +1,6 @@
 <?php
-
+use TopviewDigital\TranslationHelper\Model\VocabTerm;
+use TopviewDigital\TranslationHelper\Model\VocabCite;
 use TopviewDigital\TranslationHelper\Service\Translation;
 
 if (!function_exists('is_json')) {
