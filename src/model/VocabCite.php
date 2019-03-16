@@ -14,7 +14,7 @@ class VocabCite extends Model
     {
         $connection = config('trans-helper.database.connection') ?: config('database.default');
         $this->setConnection($connection);
-        $this->setTable('_tans_helper_cites');
+        $this->setTable('_trans_helper_cites');
         parent::__construct($attributes);
     }
 
