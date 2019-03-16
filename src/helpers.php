@@ -25,7 +25,7 @@ if (!function_exists('localize')) {
     function localize($languages, string $failback = '')
     {
         if (is_array($languages) || is_json($languages)) {
-            $languages = (!is_array($languages)) ? (array)json_decode($languages) : $languages;
+            $languages = (!is_array($languages)) ? (array) json_decode($languages) : $languages;
             $locales = array_keys($languages);
             $system = \App::getLocale();
             $default = config('app.locale');
@@ -44,7 +44,7 @@ if (!function_exists('localize')) {
             $cite['class'] = $tracer[0]['class'] ?? '';
             $vocab = [];
             $vocab['namespace'] = preg_replace(
-                '/(^' . addcslashes(base_path(), '\/') . ')|(\.php$)/',
+                '/(^'.addcslashes(base_path(), '\/').')|(\.php$)/',
                 '',
                 $cite['file']
             );
@@ -61,14 +61,14 @@ if (!function_exists('localize')) {
                 dispatch(new Translation($vocab, [app()->getLocale()]));
             }
             $cite['file'] = preg_replace(
-                '/^' . addcslashes(base_path(), '\/') . '/',
+                '/^'.addcslashes(base_path(), '\/').'/',
                 '',
                 $cite['file']
             );
             $cite = VocabCite::firstOrCreate($cite);
             $vocab->cites()->sync([$cite->id], false);
             if (!$cite->code) {
-                $lines = explode("\n", file_get_contents(base_path() . $cite->file));
+                $lines = explode("\n", file_get_contents(base_path().$cite->file));
                 $cite->code = $lines[$cite->line - 1];
                 if (substr($cite->file, -10) != '.blade.php') {
                     for ($start = $cite->line - 2; $start > -1; $start--) {
@@ -159,27 +159,17 @@ if (!function_exists('export')) {
         $namespaces = VocabTerm::namespaces();
         foreach ($namespaces as $namespace) {
             foreach ($locales as $locale) {
-                $langue_file=str_replace('/', '.', strtolower(ltrim($namespace,'/')));
-                $langue_file = str_replace('//', '/', implode('/',[$path,$locale,$langue_file]));
-                $lines=['<?php','','return ['];
+                $langue_file = str_replace('/', '.', strtolower(ltrim($namespace, '/')));
+                $langue_file = str_replace('//', '/', implode('/', [$path, $locale, $langue_file]));
+                $lines = ['<?php', '', 'return ['];
                 foreach (VocabTerm::where('namespace', $namespace)->get() as $term) {
-                        $lines[]=sprintf("    '%s'=>'%s',",
+                    $lines[] = sprintf("    '%s'=>'%s',",
                         $term->slug,
-                        localize($term->translation,$term->translation[config('app.locale')]));
+                        localize($term->translation, $term->translation[config('app.locale')]));
                 }
-                $lines[]='];';
-                file_put_contents($langue_file,implode("\n",$lines));
+                $lines[] = '];';
+                file_put_contents($langue_file, implode("\n", $lines));
             }
         }
     }
 }
-
- 
- 
- 
- 
- 
- 
- 
- 
- 

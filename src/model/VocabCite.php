@@ -32,12 +32,12 @@ class VocabCite extends Model
 
     public function sweep()
     {
-        $line = explode("\n", file_get_contents(base_path() . $this->file));
+        $line = explode("\n", file_get_contents(base_path().$this->file));
         $line = $line[$this->line - 1] ?? '';
         $count = 0;
         if ($line) {
             foreach ($this->terms()->get() as $term) {
-                $keywords = ["localize('{$term->term}')", 'localize("' . $term->term . '")'];
+                $keywords = ["localize('{$term->term}')", 'localize("'.$term->term.'")'];
                 $matched = array_filter(array_map(function ($u) use ($line) {
                     return strpos($line, $u);
                 }, $keywords), 'strlen');

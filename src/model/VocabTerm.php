@@ -37,7 +37,8 @@ class VocabTerm extends Model
     {
         $key = slugify($this->translation['en']);
         $key = strlen($key) > 20 ? substr($key, 0, 20) : $key;
-        $key .= '_' . substr(uniqid(), -5);
+        $key .= '_'.substr(uniqid(), -5);
+
         return $key;
     }
 
