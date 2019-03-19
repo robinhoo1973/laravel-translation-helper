@@ -37,9 +37,9 @@ class Translation implements ShouldQueue
     {
         if (empty($this->term)) {
             sweep();
-            array_map(function($u) {
+            foreach (VocabTerm::get()->all() as $u) {
                 $this->translation($u, $this->locales);
-            }, VocabTerm::get()->all());
+            }
         } else {
             $this->translation($this->term);
         }
@@ -65,16 +65,25 @@ class Translation implements ShouldQueue
 
             try {
                 $language = new GoogleTranslate();
-                $translation = $term->translation;
+                // $language->setOptions($this->randomUserAgent())
+                //     ->setSource()
+                //     ->setTarget(config('app.locale'))
+                //     ->translate($term->term);
+                // $default_locale = $language->setOptions($this->randomUserAgent())->getLastDetectedSource();
+                $translation = empty($term->translation) ? [] : $term->translation;
                 foreach ($this->locales as $locale) {
                     if (!array_key_exists($locale, $term->translation)) {
                         $translation[$locale] = $language
                             ->setOptions($this->randomUserAgent())
-                            ->setSource(config('app.locale'))
+                            ->setSource()
                             ->setTarget($locale)
                             ->translate($term->term);
                         $this->called++;
                     }
+                }
+                $locale = $language->setOptions($this->randomUserAgent())->getLastDetectedSource();
+                if (!array_key_exists($locale, $term->translation)) {
+                    $translation[$locale] = $term->term;
                 }
                 $term->translation = $translation;
                 $language = null;

@@ -52,11 +52,10 @@ if (!function_exists('localize')) {
         if (is_array($languages) || is_json($languages)) {
             $languages = (!is_array($languages)) ? (array)json_decode($languages) : $languages;
             $locales = array_keys($languages);
-            $system = \App::getLocale();
+            $system = app()->getLocale();
             $default = config('app.locale');
 
             $locale = in_array($system, $locales) ? $system : (in_array($default, $locales) ? $default : null);
-
             return  $locale ? $languages[$locale] : $failback;
         }
         if (is_string($languages) && empty($failback)) {
@@ -75,13 +74,9 @@ if (!function_exists('localize')) {
             );
             $vocab['term'] = $languages;
             $vocab = VocabTerm::firstOrCreate($vocab);
-            if (!$vocab->transaltion) {
-                $vocab->translation = [config('app.locale') => $vocab['term']];
-                $vocab->save();
-                if (auto_trans_able()) {
-                    dispatch(new Translation($vocab));
-                }
-            }
+            $vocab->refresh();
+            $vocab->translation = empty($vocab->translation) ? [] : $vocab->translation;
+            $vocab->save();
             if (auto_trans_able() && !in_array(app()->getLocale(), array_keys($vocab->translation))) {
                 dispatch(new Translation($vocab, [app()->getLocale()]));
             }
@@ -91,12 +86,17 @@ if (!function_exists('localize')) {
                 $cite['file']
             );
             $cite = VocabCite::firstOrCreate($cite);
+            $cite->refresh();
             $vocab->cites()->sync([$cite->id], false);
             if (!$cite->code) {
                 $lines = explode("\n", file_get_contents(base_path() . $cite->file));
                 $cite->code = $lines[$cite->line - 1];
                 if (substr($cite->file, -10) != '.blade.php') {
-                    for ($start = $cite->line - 2; $start > -1; $start--) {
+                    for (
+                        $start = $cite->line - 2;
+                        $start > -1;
+                        $start--
+                    ) {
                         $char = substr(rtrim($lines[$start]), -1);
                         if ($char == ';' || $char == '}' || $char == '{') {
                             $start++;
@@ -104,7 +104,11 @@ if (!function_exists('localize')) {
                         }
                     }
                     $count = count($lines);
-                    for ($end = $cite->line - 1; $end < $count; $end++) {
+                    for (
+                        $end = $cite->line - 1;
+                        $end < $count;
+                        $end++
+                    ) {
                         $char = substr(rtrim($lines[$end]), -1);
                         if ($char == ';') {
                             break;
@@ -112,8 +116,8 @@ if (!function_exists('localize')) {
                     }
                     $code = array_filter(array_slice($lines, $start, $end - $start + 1, true), 'trim');
                     $max = strlen($end);
-                    $cite->code = implode("\n", array_map(function($u, $v) use ($max) {
-                        return sprintf("%{$max}d    %s", $u + 1, rtrim($v));
+                    $cite->code = implode("\n", array_map(function ($u, $v) use ($max) {
+                        return sprintf("%{$max}d    %s  ", $u + 1, rtrim($v));
                     }, array_keys($code), $code));
                     $cite->save();
                 }
@@ -130,7 +134,7 @@ if (!function_exists('sweep')) {
     function sweep()
     {
         array_map(
-            function($u) {
+            function ($u) {
                 $u->sweep();
             },
             array_merge(
@@ -181,7 +185,7 @@ if (!function_exists('unique_slugs')) {
     {
         $keys = array_keys($slugs);
         $slugs = array_values($slugs);
-        $slugs = array_map(function($k, $v) use ($slugs) {
+        $slugs = array_map(function ($k, $v) use ($slugs) {
             if ($k > 0 && in_array($v, array_slice($slugs, 0, $k - 1))) {
                 $v .= '-' . uniqid();
             }
@@ -202,10 +206,10 @@ if (!function_exists('lang_file_name')) {
 }
 
 if (!function_exists('export')) {
-    function export($path = null, $locales = null)
+    function export($path = null)
     {
         $path = $path ?? config('trans-helper.export.path');
-        $locales = $locales ?? VocabTerm::locales();
+        $locales = VocabTerm::locales();
         $namespaces = VocabTerm::namespaces();
         foreach ($namespaces as $namespace) {
             foreach ($locales as $locale) {
@@ -226,7 +230,7 @@ if (!function_exists('export')) {
                 }
                 $slugs = unique_slugs($slugs);
                 $max = intdiv(max(array_map('strlen', $slugs)) + 3, 4) * 4;
-                $lines = array_map(function($u, $v) use ($max) {
+                $lines = array_map(function ($u, $v) use ($max) {
                     $u = "'{$u}'";
                     return sprintf("    %-{$max}s => '%s',", $u, $v);
                 }, $slugs, $terms);
