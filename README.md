@@ -5,7 +5,7 @@
 [![Code Intelligence Status](https://scrutinizer-ci.com/g/robinhoo1973/laravel-translation-helper/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 [![License](https://img.shields.io/packagist/l/topview-digital/laravel-translation-helper.svg)]()
 [![Total Downloads](https://img.shields.io/packagist/dt/topview-digital/laravel-translation-helper.svg)](https://packagist.org/packages/topview-digital/laravel-translation-helper)
-
+[![HitCount](http://hits.dwyl.io/robinhoo1973/https://github.com/robinhoo1973/laravel-translation-helper.svg)](http://hits.dwyl.io/robinhoo1973/https://github.com/robinhoo1973/laravel-translation-helper)
 # Laravel Translation Helper
 
 
@@ -94,8 +94,8 @@ php artisan trans-helper:install
 ```
 
 ### Configure Queue
-If you want use the auto translation feature, please also config your queue config file and .env file
-if you have enabled the queue feature for default queue, please skipp below instructions.
+If you want use the auto translation feature, please also config your queue config file and .env file.
+If you have enabled the queue feature for default queue, please skipp below instructions.
 config/queue.php[example]
 ```
 <?php
@@ -191,6 +191,11 @@ return [
 ```
 QUEUE_CONNECTION=database
 ```
+After your configuration done, please ensure the your queue is up and running. Simple way is run 
+```
+php artisan queue:work --queue=default
+```
+and make it running all the time in the background.
 ## Usage
 
 For the following examples
