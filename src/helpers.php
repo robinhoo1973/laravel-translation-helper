@@ -4,7 +4,7 @@ use TopviewDigital\TranslationHelper\Model\VocabTerm;
 use TopviewDigital\TranslationHelper\Model\VocabCite;
 use TopviewDigital\TranslationHelper\Service\Translation;
 
-if (! function_exists('array_sort_value')) {
+if (!function_exists('array_sort_value')) {
     function array_sort_value($array, $mode = SORT_LOCALE_STRING)
     {
         // SORT_REGULAR - compare items normally (don't change types)
@@ -15,8 +15,8 @@ if (! function_exists('array_sort_value')) {
         // SORT_NATURAL - compare items as strings using "natural ordering" like natsort()
         // SORT_FLAG_CASE
 
-        if (! is_array($array)) {
-            $array = method_exists($array, 'toArray') ? $array->toArray() : (array) $array;
+        if (!is_array($array)) {
+            $array = method_exists($array, 'toArray') ? $array->toArray() : (array)$array;
         }
         // \Locale::setDefault(str_replace('-', '_', \App::getLocale()));
         $keys = array_keys($array);
@@ -202,10 +202,10 @@ if (!function_exists('lang_file_name')) {
 }
 
 if (!function_exists('export')) {
-    function export($path = null)
+    function export($path = null, $locales = null)
     {
         $path = $path ?? config('trans-helper.export.path');
-        $locales = VocabTerm::locales();
+        $locales = $locales ?? VocabTerm::locales();
         $namespaces = VocabTerm::namespaces();
         foreach ($namespaces as $namespace) {
             foreach ($locales as $locale) {

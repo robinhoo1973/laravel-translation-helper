@@ -7,7 +7,7 @@ return [
     | Laravel-Translation-Helper Database Settings
     |--------------------------------------------------------------------------
     |
-    | Here are database settings for Laravel-Translation-Helper builtin model & tables.
+    | Here are database settings for Laravel-Translation-Helper builtin tables connction.
     |
     */
     'database' => [
@@ -21,13 +21,13 @@ return [
     | Laravel-Translation-Helper Translation Settings
     |--------------------------------------------------------------------------
     |
-    | Here are database settings for Laravel-Translation-Helper builtin model & tables.
+    | Here are translating settings for Laravel-Translation-Helper trigger auto translation.
     |
     */
 
     // Vocabulary data tables and model.
     'translation' => [
-        'mode' => 'auto', //auto,manual,off
+        'mode' => 'auto',
     ],
 
     /*
@@ -35,7 +35,7 @@ return [
     | Laravel-Translation-Helper Exporting Settings
     |--------------------------------------------------------------------------
     |
-    | Here are database settings for Laravel-Translation-Helper builtin model & tables.
+    | Here are exporting settings for Laravel-Translation-Helper.
     |
     */
 
