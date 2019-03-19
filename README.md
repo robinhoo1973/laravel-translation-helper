@@ -25,13 +25,13 @@ composer require topview-digital/laravel-translation-helper
 ```
 Laravel will automatically register the [ServiceProvider](https://github.com/robinhoo1973/laravel-translation-helper/blob/master/src/TranslationHelperServiceProvider.php).
 
-# Publish Package
+### Publish Package
 After installation, please publish the assets by below commands
 ```
 php artisan trans-helper:publish
 ```
 
-# Configure Package
+### Configure Package
 Please config your settings in config/trans-helper.php file, it should looks like below
 
 ```
@@ -90,7 +90,7 @@ Once you confired your settings, you may run  install command to setup the table
 php artisan trans-helper:install
 ```
 
-# Configure Queue
+### Configure Queue
 If you want use the auto translation feature, please also config your queue config file and .env file
 if you have enabled the queue feature for default queue, please skipp below instructions.
 config/queue.php[example]
@@ -192,7 +192,7 @@ QUEUE_CONNECTION=database
 
 For the following examples
 
-# Translation
+### Translation
 
 You can wrap your strings, NO parameters invovled, in helper function localize()
 
@@ -201,7 +201,7 @@ $form->select('mode', localize('项目模式'))->options([localize('1对1单人�
 ```
 And the helper will translate the string into relavent languages accroding to your current locale of laravel user while you have laravel queue function enabled and queue default is running in background.
 
-# Sweep
+### Sweep
 
 As the process of development the strings in the code changes a lot, you may manually run command
 ```
@@ -216,7 +216,7 @@ php artisan trans-helper:trans
 or call the translation in your code by calling helper function translate($locales=[]), the inbound parameter is the locale codes you want to translate like ['en','zh-CN','br','de'...], default locales are the config('app.locale'), config('app.fallback_locale'), config('app.faker_locale').
 
 
-# Export
+### Export
 You can use the translation feature without text lang files, you really need them. You can use export command to get them
 ```
 php artisan trans-helper:export
