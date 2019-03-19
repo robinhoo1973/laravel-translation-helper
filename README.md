@@ -1,7 +1,7 @@
 
 [![GitHub release](https://img.shields.io/github/release/robinhoo1973/laravel-translation-helper.svg)]()
-[![License](https://img.shields.io/packagist/l/topview-digital/laravel-unique-json-rule.svg)]()
-[![Total Downloads](https://img.shields.io/packagist/dt/topview-digital/laravel-unique-json-rule.svg)](https://packagist.org/packages/topview-digital/laravel-unique-json-rule)
+[![License](https://img.shields.io/packagist/l/topview-digital/laravel-translation-helper.svg)]()
+[![Total Downloads](https://img.shields.io/packagist/dt/topview-digital/laravel-translation-helper.svg)](https://packagist.org/packages/topview-digital/laravel-translation-helper)
 
 # Laravel Translation Helper
 
