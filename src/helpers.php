@@ -112,7 +112,7 @@ if (!function_exists('localize')) {
                     }
                     $code = array_filter(array_slice($lines, $start, $end - $start + 1, true), 'trim');
                     $max = strlen($end);
-                    $cite->code = implode("\n", array_map(function ($u, $v) use ($max) {
+                    $cite->code = implode("\n", array_map(function($u, $v) use ($max) {
                         return sprintf("%{$max}d    %s", $u + 1, rtrim($v));
                     }, array_keys($code), $code));
                     $cite->save();
@@ -130,7 +130,7 @@ if (!function_exists('sweep')) {
     function sweep()
     {
         array_map(
-            function ($u) {
+            function($u) {
                 $u->sweep();
             },
             array_merge(
@@ -181,7 +181,7 @@ if (!function_exists('unique_slugs')) {
     {
         $keys = array_keys($slugs);
         $slugs = array_values($slugs);
-        $slugs = array_map(function ($k, $v) use ($slugs) {
+        $slugs = array_map(function($k, $v) use ($slugs) {
             if ($k > 0 && in_array($v, array_slice($slugs, 0, $k - 1))) {
                 $v .= '-' . uniqid();
             }
@@ -226,7 +226,7 @@ if (!function_exists('export')) {
                 }
                 $slugs = unique_slugs($slugs);
                 $max = intdiv(max(array_map('strlen', $slugs)) + 3, 4) * 4;
-                $lines = array_map(function ($u, $v) use ($max) {
+                $lines = array_map(function($u, $v) use ($max) {
                     $u = "'{$u}'";
                     return sprintf("    %-{$max}s => '%s',", $u, $v);
                 }, $slugs, $terms);
