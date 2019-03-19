@@ -191,6 +191,11 @@ return [
 ```
 QUEUE_CONNECTION=database
 ```
+After your configuration done, please ensure the your queue is up and running. Simple way is run 
+```
+php artisan queue:work --queue=default
+```
+and make it running all the time in the background.
 ## Usage
 
 For the following examples
