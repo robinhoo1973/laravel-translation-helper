@@ -57,7 +57,7 @@ class VocabTerm extends Model
             call_user_func_array(
                 'array_merge',
                 array_map(
-                    function ($u) {
+                    function($u) {
                         return array_keys($u->translation);
                     },
                     self::get()->all()
