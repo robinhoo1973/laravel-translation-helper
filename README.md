@@ -5,7 +5,7 @@
 [![Code Intelligence Status](https://scrutinizer-ci.com/g/robinhoo1973/laravel-translation-helper/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 [![License](https://img.shields.io/packagist/l/topview-digital/laravel-translation-helper.svg)]()
 [![Total Downloads](https://img.shields.io/packagist/dt/topview-digital/laravel-translation-helper.svg)](https://packagist.org/packages/topview-digital/laravel-translation-helper)
-
+[![HitCount](http://hits.dwyl.io/robinhoo1973/https://github.com/robinhoo1973/laravel-translation-helper.svg)](http://hits.dwyl.io/robinhoo1973/https://github.com/robinhoo1973/laravel-translation-helper)
 # Laravel Translation Helper
 
 
