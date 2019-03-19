@@ -94,8 +94,8 @@ php artisan trans-helper:install
 ```
 
 ### Configure Queue
-If you want use the auto translation feature, please also config your queue config file and .env file
-if you have enabled the queue feature for default queue, please skipp below instructions.
+If you want use the auto translation feature, please also config your queue config file and .env file.
+If you have enabled the queue feature for default queue, please skipp below instructions.
 config/queue.php[example]
 ```
 <?php
