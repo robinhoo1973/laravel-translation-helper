@@ -65,7 +65,7 @@ if (!function_exists('prepare_vocab')) {
         $vocab->translation = empty($vocab->translation) ? [] : $vocab->translation;
         $vocab->save();
         if (auto_trans_able() && !array_key_exists(app()->getLocale(), $vocab->translation)) {
-            dispatch(new AsyncBroker(new Translation($vocab)));
+            AsyncBroker::dispatch(new Translation($vocab))->onQueue('translation');
         }
         return $vocab;
     }
@@ -89,7 +89,7 @@ if (!function_exists('localize')) {
             if (config('trans-helper.cite.enable')) {
                 $updater = new CiteUpdater($vocab, $tracer);
                 if (config('trans-helper.cite.async')) {
-                    dispatch(new AsyncBroker($updater));
+                    AsyncBroker::dispatch($updater)->onqueue('cite');
                 } else {
                     $updater->handle();
                 }
