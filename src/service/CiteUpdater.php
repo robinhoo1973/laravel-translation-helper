@@ -1,9 +1,10 @@
 <?php
+
 namespace TopviewDigital\TranslationHelper\Service;
 
-use TopviewDigital\TranslationHelper\Model\VocabTerm;
-use TopviewDigital\TranslationHelper\Model\VocabCite;
 use TopviewDigital\TranslationHelper\Interfaces\AsyncBrokerInterface;
+use TopviewDigital\TranslationHelper\Model\VocabCite;
+use TopviewDigital\TranslationHelper\Model\VocabTerm;
 
 class CiteUpdater implements AsyncBrokerInterface
 {
@@ -32,7 +33,7 @@ class CiteUpdater implements AsyncBrokerInterface
     private function initVocabCite(VocabCite $cite)
     {
         if (empty($cite->code)) {
-            $lines = explode("\n", file_get_contents(base_path() . $cite->file));
+            $lines = explode("\n", file_get_contents(base_path().$cite->file));
             $cite->code = $lines[$cite->line - 1];
             if (substr($cite->file, -10) != '.blade.php') {
                 for ($start = $cite->line - 2; $start > -1; $start--) {

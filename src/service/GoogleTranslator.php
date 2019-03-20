@@ -22,21 +22,23 @@ class GoogleTranslator implements TranslatorInterface
     public function word(string $word)
     {
         $this->word = $word;
+
         return $this;
     }
 
     public function targetLocale(string $target_locale)
     {
         $this->target_locale = $target_locale;
+
         return $this;
     }
 
     public function sourceLocale(string $source_locale)
     {
         $this->source_locale = $source_locale;
+
         return $this;
     }
-
 
     private function randomUserAgent()
     {
@@ -56,6 +58,7 @@ class GoogleTranslator implements TranslatorInterface
         $translator = new GoogleTranslate();
         while (empty($translated) && !empty($this->word)) {
             $this->called = 0;
+
             try {
                 $translated = is_null($this->source_locale)
                     ? $translator
@@ -77,6 +80,7 @@ class GoogleTranslator implements TranslatorInterface
                 sleep($mins * 60);
             }
         }
+
         return $translated;
     }
 }

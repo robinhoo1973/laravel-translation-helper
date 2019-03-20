@@ -1,7 +1,8 @@
 <?php
+
 use Illuminate\Support\Str;
-use TopviewDigital\TranslationHelper\Model\VocabTerm;
 use TopviewDigital\TranslationHelper\Model\VocabCite;
+use TopviewDigital\TranslationHelper\Model\VocabTerm;
 use TopviewDigital\TranslationHelper\Service\Translation;
 
 if (!function_exists('array_sort_value')) {
@@ -16,7 +17,7 @@ if (!function_exists('array_sort_value')) {
         // SORT_FLAG_CASE
 
         if (!is_array($array)) {
-            $array = method_exists($array, 'toArray') ? $array->toArray() : (array)$array;
+            $array = method_exists($array, 'toArray') ? $array->toArray() : (array) $array;
         }
         // \Locale::setDefault(str_replace('-', '_', \App::getLocale()));
         $keys = array_keys($array);
@@ -50,12 +51,13 @@ if (!function_exists('localize')) {
     function localize($languages, string $failback = '')
     {
         if (is_array($languages) || is_json($languages)) {
-            $languages = (!is_array($languages)) ? (array)json_decode($languages) : $languages;
+            $languages = (!is_array($languages)) ? (array) json_decode($languages) : $languages;
             $locales = array_keys($languages);
             $system = app()->getLocale();
             $default = config('app.locale');
 
             $locale = in_array($system, $locales) ? $system : (in_array($default, $locales) ? $default : null);
+
             return  $locale ? $languages[$locale] : $failback;
         }
         if (is_string($languages) && empty($failback)) {
@@ -68,7 +70,7 @@ if (!function_exists('localize')) {
             $cite['class'] = $tracer[0]['class'] ?? '';
             $vocab = [];
             $vocab['namespace'] = preg_replace(
-                '/(^' . addcslashes(base_path(), '\/') . ')|(\.php$)/',
+                '/(^'.addcslashes(base_path(), '\/').')|(\.php$)/',
                 '',
                 $cite['file']
             );
@@ -81,7 +83,7 @@ if (!function_exists('localize')) {
                 dispatch(new Translation($vocab, [app()->getLocale()]));
             }
             $cite['file'] = preg_replace(
-                '/^' . addcslashes(base_path(), '\/') . '/',
+                '/^'.addcslashes(base_path(), '\/').'/',
                 '',
                 $cite['file']
             );
@@ -89,7 +91,7 @@ if (!function_exists('localize')) {
             $cite->refresh();
             $vocab->cites()->sync([$cite->id], false);
             if (!$cite->code) {
-                $lines = explode("\n", file_get_contents(base_path() . $cite->file));
+                $lines = explode("\n", file_get_contents(base_path().$cite->file));
                 $cite->code = $lines[$cite->line - 1];
                 if (substr($cite->file, -10) != '.blade.php') {
                     for (
@@ -187,10 +189,12 @@ if (!function_exists('unique_slugs')) {
         $slugs = array_values($slugs);
         $slugs = array_map(function ($k, $v) use ($slugs) {
             if ($k > 0 && in_array($v, array_slice($slugs, 0, $k - 1))) {
-                $v .= '-' . uniqid();
+                $v .= '-'.uniqid();
             }
+
             return $v;
         }, array_keys($slugs), $slugs);
+
         return array_combine($keys, $slugs);
     }
 }
@@ -200,7 +204,8 @@ if (!function_exists('lang_file_name')) {
     {
         $lang_file = str_replace('/', '.', strtolower(ltrim(Str::snake($namespace), '/')));
         $lang_file = str_replace('//', '/', implode('/', [$path, $locale, $lang_file]));
-        $lang_file = str_replace('._', '.', $lang_file) . '.php';
+        $lang_file = str_replace('._', '.', $lang_file).'.php';
+
         return $lang_file;
     }
 }
@@ -232,6 +237,7 @@ if (!function_exists('export')) {
                 $max = intdiv(max(array_map('strlen', $slugs)) + 3, 4) * 4;
                 $lines = array_map(function ($u, $v) use ($max) {
                     $u = "'{$u}'";
+
                     return sprintf("    %-{$max}s => '%s',", $u, $v);
                 }, $slugs, $terms);
                 $lines[] = "];\n";

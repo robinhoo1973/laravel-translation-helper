@@ -3,7 +3,6 @@
 namespace TopviewDigital\TranslationHelper\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Schema;
 
 class InstallCommand extends Command
 {
@@ -43,7 +42,6 @@ class InstallCommand extends Command
      */
     public function initDatabase()
     {
-
         $this->call('migrate');
     }
 }
