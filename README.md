@@ -50,9 +50,25 @@ return [
     | Here are database settings for Laravel-Translation-Helper builtin tables connction.
     |
     */
+
     'database' => [
         // Database connection for following tables.
         'connection' => '',
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Laravel-Translation-Helper Citing Settings
+    |--------------------------------------------------------------------------
+    |
+    | Here are citing settings for Laravel-Translation-Helper.
+    |
+    */
+
+    'cite' => [
+        'enable' => true,
+        'async' => true,
 
     ],
 
@@ -65,8 +81,9 @@ return [
     |
     */
 
-    // Vocabulary data tables and model.
+    // Translation mode setting
     'translation' => [
+        'broker' => TopviewDigital\TranslationHelper\Service\GoogleTranslator::class,
         'mode' => 'auto',
     ],
 
@@ -79,11 +96,10 @@ return [
     |
     */
 
-    // Vocabulary data tables and model.
+    // Exporting data config setting.
     'export' => [
         'path' => realpath(base_path('resources/lang')),
     ],
-
 ];
 
 ```
@@ -196,6 +212,77 @@ After your configuration done, please ensure the your queue is up and running. S
 php artisan queue:work --queue=default
 ```
 and make it running all the time in the background.
+
+### Define Figure out the terms' cited place
+
+You could follow up on the translation later by setup the web interface to fine-tuning the interpretations. However, sometimes it's difficult to recall where the terms are used. You can turn on the feature of cite, and it will help you to record the place you cited the term in your code.
+
+### Define Your Own Translator
+
+You can define your own translator by reference the code below, and set it in config.
+
+```
+<?php
+
+namespace TopviewDigital\TranslationHelper\Service;
+
+use Campo\UserAgent;
+use Stichoza\GoogleTranslate\GoogleTranslate;
+use TopviewDigital\TranslationHelper\Interfaces\TranslatorInterface;
+
+class GoogleTranslator implements TranslatorInterface
+{
+    protected $break = 0;
+    protected $called = 0;
+    protected $word;
+    protected $source_locale = null;
+    protected $target_locale;
+
+    public function __construct()
+    {
+        $this->target_locale = config('app.locale');
+    }
+
+    public function word(string $word)
+    {
+        $this->word = $word;
+        return $this;
+    }
+
+    public function targetLocale(string $target_locale)
+    {
+        $this->target_locale = $target_locale;
+        return $this;
+    }
+
+    public function sourceLocale(string $source_locale)
+    {
+        $this->source_locale = $source_locale;
+        return $this;
+    }
+
+    public function translate()
+    {
+        $translated = '';
+        $translator = new GoogleTranslate();
+        try {
+            $translated = is_null($this->source_locale)
+                ? $translator
+                ->setSource()
+                ->setTarget($this->target_locale)
+                ->translate($this->word)
+                : $translator
+                ->setSource($this->source_locale)
+                ->setTarget($this->target_locale)
+                ->translate($this->word);
+        } catch (Exception $e) {
+            return null;
+        }
+        return $translated;
+    }
+}
+```
+
 ## Usage
 
 For the following examples

@@ -10,9 +10,25 @@ return [
     | Here are database settings for Laravel-Translation-Helper builtin tables connction.
     |
     */
+
     'database' => [
         // Database connection for following tables.
         'connection' => '',
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Laravel-Translation-Helper Citing Settings
+    |--------------------------------------------------------------------------
+    |
+    | Here are citing settings for Laravel-Translation-Helper.
+    |
+    */
+
+    'cite' => [
+        'enable' => true,
+        'async' => true,
 
     ],
 
@@ -25,8 +41,9 @@ return [
     |
     */
 
-    // Vocabulary data tables and model.
+    // Translation mode setting
     'translation' => [
+        'broker' => TopviewDigital\TranslationHelper\Service\GoogleTranslator::class,
         'mode' => 'auto',
     ],
 
@@ -39,9 +56,8 @@ return [
     |
     */
 
-    // Vocabulary data tables and model.
+    // Exporting data config setting.
     'export' => [
         'path' => realpath(base_path('resources/lang')),
     ],
-
 ];

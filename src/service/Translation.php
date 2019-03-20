@@ -2,101 +2,66 @@
 
 namespace TopviewDigital\TranslationHelper\Service;
 
-use Campo\UserAgent;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 use TopviewDigital\TranslationHelper\Model\VocabTerm;
+use TopviewDigital\TranslationHelper\Interfaces\AsyncBrokerInterface;
 
-class Translation implements ShouldQueue
+class Translation implements AsyncBrokerInterface
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $break = 0;
-    protected $term;
-    protected $locales;
-    protected $translation;
+    protected $locales = [];
+    protected $words = [];
 
-    public function __construct(VocabTerm $term = null, array $locales = [])
+    public function __construct(VocabTerm $vocab = null)
+    {
+        $this->locales = [
+            app()->getLocale(),
+            config('app.locale'),
+            config('app.fallback_locale'),
+            config('app.faker_locale'),
+        ];
+        $this->words = $vocab ? [$vocab->id] : $this->words;
+    }
+
+    public function targetLocales($locales = [])
     {
         $this->locales = array_unique(
-            array_merge($locales, [
-                app()->getLocale(),
-                config('app.locale'),
-                config('app.fallback_locale'),
-                config('app.faker_locale'),
-            ])
+            array_merge(
+                $this->locales,
+                $locales
+            )
         );
-        $this->term = $term;
+        return $this;
     }
+
+    public function words($words = null)
+    {
+
+        $words = $words ? VocabTerm::whereIn('term', (array)words)->pluck('id')->toarray() : $words;
+        $this->words = $words ?? ($this->words ?: VocabTerm::pluck('id')->toArray());
+        return $this;
+    }
+
+
 
     public function handle()
     {
-        if (empty($this->term)) {
-            sweep();
-            foreach (VocabTerm::get()->all() as $u) {
-                $this->translation($u, $this->locales);
-            }
-        } else {
-            $this->translation($this->term);
+        foreach ($this->words as $word) {
+            $this->translation(VocabTerm::find($word));
         }
     }
 
-    private function randomUserAgent()
+    private function translation(VocabTerm $word)
     {
-        sleep(1);
-        $this->called++;
-
-        return [
-            'headers' => [
-                'User-Agent' => UserAgent::random(),
-            ],
-        ];
-    }
-
-    private function translation(VocabTerm $term)
-    {
-        $row = 0;
-        while ($row < 1) {
-            $this->called = 0;
-
-            try {
-                $language = new GoogleTranslate();
-                // $language->setOptions($this->randomUserAgent())
-                //     ->setSource()
-                //     ->setTarget(config('app.locale'))
-                //     ->translate($term->term);
-                // $default_locale = $language->setOptions($this->randomUserAgent())->getLastDetectedSource();
-                $translation = empty($term->translation) ? [] : $term->translation;
-                foreach ($this->locales as $locale) {
-                    if (!array_key_exists($locale, $term->translation)) {
-                        $translation[$locale] = $language
-                            ->setOptions($this->randomUserAgent())
-                            ->setSource()
-                            ->setTarget($locale)
-                            ->translate($term->term);
-                        $this->called++;
-                    }
-                }
-                $locale = $language->setOptions($this->randomUserAgent())->getLastDetectedSource();
-                if (!array_key_exists($locale, $term->translation)) {
-                    $translation[$locale] = $term->term;
-                }
-                $term->translation = $translation;
-                $language = null;
-                $term->save();
-                $row++;
-            } catch (Exception $e) {
-                $this->break++;
-                $mins = rand(
-                    floor($this->called / ($row + 1)),
-                    floor($this->called / ($row + 1) * 2)
-                ) * $this->break;
-                sleep($mins * 60);
+        $translator = config('trans-helper.translation.broker');
+        $translator = new $translator;
+        $translated = $word->translation;
+        $this->locales = array_unique($this->locales);
+        foreach ($this->locales as $locale) {
+            if (!array_key_exists($locale, $translated)) {
+                $translated[$locale] = $translator->word($word->term)->targetLocale($locale)->translate();
             }
         }
+        $word->translation = $translated;
+        $word->save();
     }
 }
