@@ -4,6 +4,8 @@ use Illuminate\Support\Str;
 use TopviewDigital\TranslationHelper\Model\VocabCite;
 use TopviewDigital\TranslationHelper\Model\VocabTerm;
 use TopviewDigital\TranslationHelper\Service\Translation;
+use TopviewDigital\TranslationHelper\Service\AsyncBroker;
+use TopviewDigital\TranslationHelper\Service\CiteUpdater;
 
 if (!function_exists('array_sort_value')) {
     function array_sort_value($array, $mode = SORT_LOCALE_STRING)
@@ -17,7 +19,7 @@ if (!function_exists('array_sort_value')) {
         // SORT_FLAG_CASE
 
         if (!is_array($array)) {
-            $array = method_exists($array, 'toArray') ? $array->toArray() : (array) $array;
+            $array = method_exists($array, 'toArray') ? $array->toArray() : (array)$array;
         }
         // \Locale::setDefault(str_replace('-', '_', \App::getLocale()));
         $keys = array_keys($array);
@@ -47,11 +49,32 @@ if (!function_exists('auto_trans_able')) {
             && config('queue.default') != 'sync';
     }
 }
+
+if (!function_exists('prepare_vocab')) {
+    function prepare_vocab($term, $tracer)
+    {
+        $vocab = [];
+        $vocab['namespace'] = preg_replace(
+            '/(^' . addcslashes(base_path(), '\/') . ')|(\.php$)/',
+            '',
+            preg_replace('/(\.php)(.+)$/', '${1}', $tracer[0]['file'])
+        );
+        $vocab['term'] = $term;
+        $vocab = VocabTerm::firstOrCreate($vocab);
+        $vocab->refresh();
+        $vocab->translation = empty($vocab->translation) ? [] : $vocab->translation;
+        $vocab->save();
+        if (auto_trans_able() && !array_key_exists(app()->getLocale(), $vocab->translation)) {
+            dispatch(new AsyncBroker(new Translation($vocab)));
+        }
+        return $vocab;
+    }
+}
 if (!function_exists('localize')) {
     function localize($languages, string $failback = '')
     {
         if (is_array($languages) || is_json($languages)) {
-            $languages = (!is_array($languages)) ? (array) json_decode($languages) : $languages;
+            $languages = (!is_array($languages)) ? (array)json_decode($languages) : $languages;
             $locales = array_keys($languages);
             $system = app()->getLocale();
             $default = config('app.locale');
@@ -62,66 +85,13 @@ if (!function_exists('localize')) {
         }
         if (is_string($languages) && empty($failback)) {
             $tracer = (new Exception())->getTrace();
-            $cite = [];
-            $cite['file'] = preg_replace('/(\.php)(.+)$/', '${1}', $tracer[0]['file']);
-            $cite['line'] = $tracer[0]['line'];
-            array_shift($tracer);
-            $cite['function'] = $tracer[0]['function'] ?? '';
-            $cite['class'] = $tracer[0]['class'] ?? '';
-            $vocab = [];
-            $vocab['namespace'] = preg_replace(
-                '/(^'.addcslashes(base_path(), '\/').')|(\.php$)/',
-                '',
-                $cite['file']
-            );
-            $vocab['term'] = $languages;
-            $vocab = VocabTerm::firstOrCreate($vocab);
-            $vocab->refresh();
-            $vocab->translation = empty($vocab->translation) ? [] : $vocab->translation;
-            $vocab->save();
-            if (auto_trans_able() && !in_array(app()->getLocale(), array_keys($vocab->translation))) {
-                dispatch(new Translation($vocab, [app()->getLocale()]));
-            }
-            $cite['file'] = preg_replace(
-                '/^'.addcslashes(base_path(), '\/').'/',
-                '',
-                $cite['file']
-            );
-            $cite = VocabCite::firstOrCreate($cite);
-            $cite->refresh();
-            $vocab->cites()->sync([$cite->id], false);
-            if (!$cite->code) {
-                $lines = explode("\n", file_get_contents(base_path().$cite->file));
-                $cite->code = $lines[$cite->line - 1];
-                if (substr($cite->file, -10) != '.blade.php') {
-                    for (
-                        $start = $cite->line - 2;
-                        $start > -1;
-                        $start--
-                    ) {
-                        $char = substr(rtrim($lines[$start]), -1);
-                        if ($char == ';' || $char == '}' || $char == '{') {
-                            $start++;
-                            break;
-                        }
-                    }
-                    $count = count($lines);
-                    for (
-                        $end = $cite->line - 1;
-                        $end < $count;
-                        $end++
-                    ) {
-                        $char = substr(rtrim($lines[$end]), -1);
-                        if ($char == ';') {
-                            break;
-                        }
-                    }
-                    $code = array_filter(array_slice($lines, $start, $end - $start + 1, true), 'trim');
-                    $max = strlen($end);
-                    $cite->code = implode("\n", array_map(function ($u, $v) use ($max) {
-                        return sprintf("%{$max}d    %s  ", $u + 1, rtrim($v));
-                    }, array_keys($code), $code));
-                    $cite->save();
+            $vocab = prepare_vocab($languages, $tracer);
+            if (config('trans-helper.cite.enable')) {
+                $updater = new CiteUpdater($vocab, $tracer);
+                if (config('trans-helper.cite.async')) {
+                    dispatch(new AsyncBroker($updater));
+                } else {
+                    $updater->handle();
                 }
             }
 
@@ -189,7 +159,7 @@ if (!function_exists('unique_slugs')) {
         $slugs = array_values($slugs);
         $slugs = array_map(function ($k, $v) use ($slugs) {
             if ($k > 0 && in_array($v, array_slice($slugs, 0, $k - 1))) {
-                $v .= '-'.uniqid();
+                $v .= '-' . uniqid();
             }
 
             return $v;
@@ -204,7 +174,7 @@ if (!function_exists('lang_file_name')) {
     {
         $lang_file = str_replace('/', '.', strtolower(ltrim(Str::snake($namespace), '/')));
         $lang_file = str_replace('//', '/', implode('/', [$path, $locale, $lang_file]));
-        $lang_file = str_replace('._', '.', $lang_file).'.php';
+        $lang_file = str_replace('._', '.', $lang_file) . '.php';
 
         return $lang_file;
     }
