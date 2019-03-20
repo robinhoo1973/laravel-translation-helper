@@ -213,7 +213,7 @@ php artisan queue:work --queue=default
 ```
 and make it running all the time in the background.
 
-### Define Figure out the terms' cited place
+### Mark the Cited Code Feature
 
 You could follow up on the translation later by setup the web interface to fine-tuning the interpretations. However, sometimes it's difficult to recall where the terms are used. You can turn on the feature of cite, and it will help you to record the place you cited the term in your code.
 
