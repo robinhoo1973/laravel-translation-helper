@@ -22,7 +22,7 @@ class CreateVocabulariesTable extends Migration
         if (!Schema::connection($connection)->hasTable('_trans_helper_cites')) {
             Schema::connection($connection)->create(
                 '_trans_helper_cites',
-                function(Blueprint $table) {
+                function (Blueprint $table) {
                     $table->bigIncrements('id');
                     $table->string('file', 256)->default('');
                     $table->unsignedBigInteger('line');
@@ -44,7 +44,7 @@ class CreateVocabulariesTable extends Migration
         if (!Schema::connection($connection)->hasTable('_trans_helper_terms')) {
             Schema::connection($connection)->create(
                 '_trans_helper_terms',
-                function(Blueprint $table) {
+                function (Blueprint $table) {
                     $table->bigIncrements('id');
                     $table->string('namespace', 256)->default('');
                     $table->string('term', 256)->default('');
@@ -63,7 +63,7 @@ class CreateVocabulariesTable extends Migration
         if (!Schema::connection($connection)->hasTable('_trans_helper_links')) {
             Schema::connection($connection)->create(
                 '_trans_helper_links',
-                function(Blueprint $table) {
+                function (Blueprint $table) {
                     $table->unsignedBigInteger('cited');
                     $table->unsignedBigInteger('vocab');
 

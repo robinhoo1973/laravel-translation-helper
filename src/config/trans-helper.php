@@ -28,7 +28,7 @@ return [
 
     'cite' => [
         'enable' => true,
-        'async' => true,
+        'async'  => true,
 
     ],
 
@@ -44,7 +44,7 @@ return [
     // Translation mode setting
     'translation' => [
         'broker' => TopviewDigital\TranslationHelper\Service\GoogleTranslator::class,
-        'mode' => 'auto',
+        'mode'   => 'auto',
     ],
 
     /*

@@ -2,12 +2,11 @@
 
 namespace TopviewDigital\TranslationHelper\Service;
 
-use TopviewDigital\TranslationHelper\Model\VocabTerm;
 use TopviewDigital\TranslationHelper\Interfaces\AsyncBrokerInterface;
+use TopviewDigital\TranslationHelper\Model\VocabTerm;
 
 class Translation implements AsyncBrokerInterface
 {
-
     protected $locales = [];
     protected $words = [];
 
@@ -30,18 +29,17 @@ class Translation implements AsyncBrokerInterface
                 $locales
             )
         );
+
         return $this;
     }
 
     public function words($words = null)
     {
-
-        $words = $words ? VocabTerm::whereIn('term', (array)words)->pluck('id')->toarray() : $words;
+        $words = $words ? VocabTerm::whereIn('term', (array) words)->pluck('id')->toarray() : $words;
         $this->words = $words ?? ($this->words ?: VocabTerm::pluck('id')->toArray());
+
         return $this;
     }
-
-
 
     public function handle()
     {
@@ -53,7 +51,7 @@ class Translation implements AsyncBrokerInterface
     private function translation(VocabTerm $word)
     {
         $translator = config('trans-helper.translation.broker');
-        $translator = new $translator;
+        $translator = new $translator();
         $translated = $word->translation;
         $this->locales = array_unique($this->locales);
         foreach ($this->locales as $locale) {
