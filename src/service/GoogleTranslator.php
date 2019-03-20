@@ -71,7 +71,7 @@ class GoogleTranslator implements TranslatorInterface
                     ->setSource($this->source_locale)
                     ->setTarget($this->target_locale)
                     ->translate($this->word);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->break++;
                 $mins = rand(
                     floor($this->called),
