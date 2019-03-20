@@ -35,7 +35,7 @@ class Translation implements AsyncBrokerInterface
 
     public function words($words = null)
     {
-        $words = $words ? VocabTerm::whereIn('term', (array) words)->pluck('id')->toarray() : $words;
+        $words = $words ? VocabTerm::whereIn('term', (array) $words)->pluck('id')->toarray() : $words;
         $this->words = $words ?? ($this->words ?: VocabTerm::pluck('id')->toArray());
 
         return $this;
