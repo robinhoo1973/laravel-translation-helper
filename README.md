@@ -17,7 +17,7 @@ Implementations of inline translation for your strings required localization and
 
 -   PHP >= 7.0
 -   MySQL >= 5.7
--   [Laravel](https://laravel.com/) >= 5.5
+-   [Laravel](https://laravel.com/) >= 5.6
 
 
 ## Installation
