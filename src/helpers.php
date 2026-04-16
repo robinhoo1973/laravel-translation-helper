@@ -210,10 +210,10 @@ if (!function_exists('export')) {
                 }
                 $max = intdiv(max(array_map('strlen', $slugs)) + 3, 4) * 4;
                 $lines = array_map(function ($u, $v) use ($max) {
-                    $u = "'" . addslashes($u) . "'";
-                    $v = addslashes($v);
+                    $key = var_export($u, true);
+                    $val = var_export($v, true);
 
-                    return sprintf("    %-{$max}s => '%s',", $u, $v);
+                    return sprintf("    %-{$max}s => %s,", $key, $val);
                 }, $slugs, $terms);
                 $lines[] = "];\n";
                 array_unshift($lines, "\nreturn [");

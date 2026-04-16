@@ -39,7 +39,7 @@ class VocabTerm extends Model
         $translation = $this->translation;
         $text = $translation[$locale]
             ?? $translation[app()->getLocale()]
-            ?? reset($translation)
+            ?? (count($translation) > 0 ? array_values($translation)[0] : '')
             ?: '';
 
         return slugify($text);

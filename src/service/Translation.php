@@ -12,7 +12,7 @@ class Translation implements AsyncBrokerInterface
 
     public function __construct(VocabTerm $vocab = null, array $locales = [])
     {
-        $this->locales = array_filter(array_unique(array_merge(
+        $this->locales = array_values(array_unique(array_filter(array_merge(
             [
                 app()->getLocale(),
                 config('app.locale'),
@@ -20,7 +20,7 @@ class Translation implements AsyncBrokerInterface
                 config('app.faker_locale'),
             ],
             $locales
-        )));
+        ), function ($v) { return is_string($v) && $v !== ''; })));
         $this->words = $vocab ? [$vocab->id] : $this->words;
     }
 
