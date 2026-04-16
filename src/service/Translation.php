@@ -3,6 +3,7 @@
 namespace TopviewDigital\TranslationHelper\Service;
 
 use TopviewDigital\TranslationHelper\Interfaces\AsyncBrokerInterface;
+use TopviewDigital\TranslationHelper\Interfaces\TranslatorInterface;
 use TopviewDigital\TranslationHelper\Model\VocabTerm;
 
 class Translation implements AsyncBrokerInterface
@@ -50,8 +51,11 @@ class Translation implements AsyncBrokerInterface
 
     private function translation(VocabTerm $word)
     {
-        $translator = config('trans-helper.translation.broker');
-        $translator = new $translator();
+        $translatorClass = config('trans-helper.translation.broker');
+        if (!is_string($translatorClass) || !is_a($translatorClass, TranslatorInterface::class, true)) {
+            throw new \InvalidArgumentException('Configured translation broker must implement TranslatorInterface.');
+        }
+        $translator = new $translatorClass();
         $translated = $word->translation;
         $this->locales = array_unique($this->locales);
         foreach ($this->locales as $locale) {

@@ -33,7 +33,11 @@ class CiteUpdater implements AsyncBrokerInterface
     private function initVocabCite(VocabCite $cite)
     {
         if (empty($cite->code)) {
-            $lines = explode("\n", file_get_contents(base_path().$cite->file));
+            $filePath = realpath(base_path() . $cite->file);
+            if ($filePath === false || strpos($filePath, realpath(base_path())) !== 0) {
+                return;
+            }
+            $lines = explode("\n", file_get_contents($filePath));
             $cite->code = $lines[$cite->line - 1];
             if (substr($cite->file, -10) != '.blade.php') {
                 for ($start = $cite->line - 2; $start > -1; $start--) {

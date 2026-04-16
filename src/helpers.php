@@ -184,17 +184,25 @@ if (!function_exists('export')) {
     function export($path = null)
     {
         $path = $path ?? config('trans-helper.export.path');
+        $basePath = realpath($path);
         $locales = VocabTerm::locales();
         $namespaces = VocabTerm::namespaces();
         foreach ($namespaces as $namespace) {
             foreach ($locales as $locale) {
                 $lang_file = lang_file_name($path, $locale, $namespace);
                 $lang_dir = dirname($lang_file);
+
+                // Ensure the output directory stays within the configured export path
+                $realLangDir = realpath($lang_dir) ?: $lang_dir;
+                if ($basePath !== false && strpos($realLangDir, $basePath) !== 0) {
+                    continue;
+                }
+
                 if (file_exists($lang_dir) && !is_dir($lang_dir)) {
                     unlink($lang_dir);
                 }
                 if (!file_exists($lang_dir)) {
-                    mkdir($lang_dir, 0777, true);
+                    mkdir($lang_dir, 0755, true);
                 }
 
                 $slugs = [];
@@ -206,9 +214,10 @@ if (!function_exists('export')) {
                 $slugs = unique_slugs($slugs);
                 $max = intdiv(max(array_map('strlen', $slugs)) + 3, 4) * 4;
                 $lines = array_map(function ($u, $v) use ($max) {
-                    $u = "'{$u}'";
+                    $u = addslashes($u);
+                    $v = addslashes($v);
 
-                    return sprintf("    %-{$max}s => '%s',", $u, $v);
+                    return sprintf("    '%-{$max}s => '%s',", $u . "'", $v);
                 }, $slugs, $terms);
                 $lines[] = "];\n";
                 array_unshift($lines, "\nreturn [");

@@ -10,6 +10,7 @@ class GoogleTranslator implements TranslatorInterface
 {
     protected $break = 0;
     protected $called = 0;
+    protected $maxRetries = 5;
     protected $word;
     protected $source_locale = null;
     protected $target_locale;
@@ -56,7 +57,7 @@ class GoogleTranslator implements TranslatorInterface
     {
         $translated = '';
         $translator = new GoogleTranslate();
-        while (empty($translated) && !empty($this->word)) {
+        while (empty($translated) && !empty($this->word) && $this->break <= $this->maxRetries) {
             $this->called = 0;
 
             try {
@@ -73,6 +74,9 @@ class GoogleTranslator implements TranslatorInterface
                     ->translate($this->word);
             } catch (\Exception $e) {
                 $this->break++;
+                if ($this->break > $this->maxRetries) {
+                    break;
+                }
                 $mins = rand(
                     floor($this->called),
                     floor($this->called * rand(2, 5))
