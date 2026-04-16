@@ -74,9 +74,6 @@ class GoogleTranslator implements TranslatorInterface
                     ->translate($this->word);
             } catch (\Exception $e) {
                 $this->break++;
-                if ($this->break > $this->maxRetries) {
-                    break;
-                }
                 $mins = rand(
                     floor($this->called),
                     floor($this->called * rand(2, 5))

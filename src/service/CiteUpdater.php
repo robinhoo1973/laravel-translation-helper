@@ -34,7 +34,9 @@ class CiteUpdater implements AsyncBrokerInterface
     {
         if (empty($cite->code)) {
             $filePath = realpath(base_path() . $cite->file);
-            if ($filePath === false || strpos($filePath, realpath(base_path())) !== 0) {
+            $basePath = realpath(base_path());
+            if ($filePath === false || $basePath === false
+                || strpos($filePath . DIRECTORY_SEPARATOR, $basePath . DIRECTORY_SEPARATOR) !== 0) {
                 return;
             }
             $lines = explode("\n", file_get_contents($filePath));

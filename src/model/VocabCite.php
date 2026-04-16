@@ -33,7 +33,9 @@ class VocabCite extends Model
     public function sweep()
     {
         $filePath = realpath(base_path() . $this->file);
-        if ($filePath === false || strpos($filePath, realpath(base_path())) !== 0) {
+        $basePath = realpath(base_path());
+        if ($filePath === false || $basePath === false
+            || strpos($filePath . DIRECTORY_SEPARATOR, $basePath . DIRECTORY_SEPARATOR) !== 0) {
             return;
         }
         $line = explode("\n", file_get_contents($filePath));

@@ -185,6 +185,24 @@ if (!function_exists('export')) {
     {
         $path = $path ?? config('trans-helper.export.path');
         $basePath = realpath($path);
+        if ($basePath === false) {
+            return;
+        }
+        // Pre-normalize a path that may not yet exist by resolving '..' components
+        $normalizePath = function (string $p): string {
+            $parts = explode(DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $p));
+            $result = [];
+            foreach ($parts as $part) {
+                if ($part === '..') {
+                    if (!empty($result)) {
+                        array_pop($result);
+                    }
+                } elseif ($part !== '.') {
+                    $result[] = $part;
+                }
+            }
+            return implode(DIRECTORY_SEPARATOR, $result);
+        };
         $locales = VocabTerm::locales();
         $namespaces = VocabTerm::namespaces();
         foreach ($namespaces as $namespace) {
@@ -193,8 +211,8 @@ if (!function_exists('export')) {
                 $lang_dir = dirname($lang_file);
 
                 // Ensure the output directory stays within the configured export path
-                $realLangDir = realpath($lang_dir) ?: $lang_dir;
-                if ($basePath !== false && strpos($realLangDir, $basePath) !== 0) {
+                $normalizedDir = $normalizePath($lang_dir);
+                if (strpos($normalizedDir . DIRECTORY_SEPARATOR, $basePath . DIRECTORY_SEPARATOR) !== 0) {
                     continue;
                 }
 
@@ -214,10 +232,10 @@ if (!function_exists('export')) {
                 $slugs = unique_slugs($slugs);
                 $max = intdiv(max(array_map('strlen', $slugs)) + 3, 4) * 4;
                 $lines = array_map(function ($u, $v) use ($max) {
-                    $u = addslashes($u);
+                    $u = "'" . addslashes($u) . "'";
                     $v = addslashes($v);
 
-                    return sprintf("    '%-{$max}s => '%s',", $u . "'", $v);
+                    return sprintf("    %-{$max}s => '%s',", $u, $v);
                 }, $slugs, $terms);
                 $lines[] = "];\n";
                 array_unshift($lines, "\nreturn [");
