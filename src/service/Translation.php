@@ -10,14 +10,17 @@ class Translation implements AsyncBrokerInterface
     protected $locales = [];
     protected $words = [];
 
-    public function __construct(VocabTerm $vocab = null)
+    public function __construct(VocabTerm $vocab = null, array $locales = [])
     {
-        $this->locales = [
-            app()->getLocale(),
-            config('app.locale'),
-            config('app.fallback_locale'),
-            config('app.faker_locale'),
-        ];
+        $this->locales = array_filter(array_unique(array_merge(
+            [
+                app()->getLocale(),
+                config('app.locale'),
+                config('app.fallback_locale'),
+                config('app.faker_locale'),
+            ],
+            $locales
+        )));
         $this->words = $vocab ? [$vocab->id] : $this->words;
     }
 
@@ -44,7 +47,10 @@ class Translation implements AsyncBrokerInterface
     public function handle()
     {
         foreach ($this->words as $word) {
-            $this->translation(VocabTerm::find($word));
+            $vocab = VocabTerm::find($word);
+            if ($vocab) {
+                $this->translation($vocab);
+            }
         }
     }
 

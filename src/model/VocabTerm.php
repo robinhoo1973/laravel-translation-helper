@@ -35,9 +35,14 @@ class VocabTerm extends Model
 
     public function getSlugAttribute($attr)
     {
-        $key = slugify($this->translation['en']);
+        $locale = config('app.locale');
+        $translation = $this->translation;
+        $text = $translation[$locale]
+            ?? $translation[app()->getLocale()]
+            ?? reset($translation)
+            ?: '';
 
-        return $key;
+        return slugify($text);
     }
 
     public function sweep()
@@ -54,6 +59,11 @@ class VocabTerm extends Model
 
     public static function locales()
     {
+        $all = self::get()->all();
+        if (empty($all)) {
+            return [];
+        }
+
         return array_unique(
             call_user_func_array(
                 'array_merge',
@@ -61,7 +71,7 @@ class VocabTerm extends Model
                     function ($u) {
                         return array_keys($u->translation);
                     },
-                    self::get()->all()
+                    $all
                 )
             )
         );

@@ -89,7 +89,7 @@ if (!function_exists('localize')) {
             if (config('trans-helper.cite.enable')) {
                 $updater = new CiteUpdater($vocab, $tracer);
                 if (config('trans-helper.cite.async')) {
-                    AsyncBroker::dispatch($updater)->onqueue('cite');
+                    AsyncBroker::dispatch($updater)->onQueue('cite');
                 } else {
                     $updater->handle();
                 }
@@ -123,6 +123,7 @@ if (!function_exists('translate')) {
         dispatch(new Translation(null, $locales));
     }
 }
+
 if (!function_exists('slugify')) {
     function slugify($text)
     {
@@ -201,12 +202,16 @@ if (!function_exists('export')) {
                 $terms = [];
                 foreach (VocabTerm::where('namespace', $namespace)->get() as $term) {
                     $slugs[] = $term->slug;
-                    $terms[] = $term->translation[$locale] ?? $term->translation[config('app.locale')];
+                    $terms[] = $term->translation[$locale] ?? $term->translation[config('app.locale')] ?? '';
                 }
                 $slugs = unique_slugs($slugs);
+                if (empty($slugs)) {
+                    continue;
+                }
                 $max = intdiv(max(array_map('strlen', $slugs)) + 3, 4) * 4;
                 $lines = array_map(function ($u, $v) use ($max) {
-                    $u = "'{$u}'";
+                    $u = "'" . addslashes($u) . "'";
+                    $v = addslashes($v);
 
                     return sprintf("    %-{$max}s => '%s',", $u, $v);
                 }, $slugs, $terms);

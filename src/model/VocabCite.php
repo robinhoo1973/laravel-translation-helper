@@ -39,8 +39,8 @@ class VocabCite extends Model
             foreach ($this->terms()->get() as $term) {
                 $keywords = ["localize('{$term->term}')", 'localize("'.$term->term.'")'];
                 $matched = array_filter(array_map(function ($u) use ($line) {
-                    return strpos($line, $u);
-                }, $keywords), 'strlen');
+                    return strpos($line, $u) !== false;
+                }, $keywords));
                 if (empty($matched)) {
                     $this->terms()->detach($term->id);
                 }

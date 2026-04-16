@@ -8,6 +8,8 @@ use TopviewDigital\TranslationHelper\Interfaces\TranslatorInterface;
 
 class GoogleTranslator implements TranslatorInterface
 {
+    const MAX_RETRIES = 5;
+
     protected $break = 0;
     protected $called = 0;
     protected $word;
@@ -42,7 +44,6 @@ class GoogleTranslator implements TranslatorInterface
 
     private function randomUserAgent()
     {
-        sleep(1);
         $this->called++;
 
         return [
@@ -56,9 +57,7 @@ class GoogleTranslator implements TranslatorInterface
     {
         $translated = '';
         $translator = new GoogleTranslate();
-        while (empty($translated) && !empty($this->word)) {
-            $this->called = 0;
-
+        while (empty($translated) && !empty($this->word) && $this->break < self::MAX_RETRIES) {
             try {
                 $translated = is_null($this->source_locale)
                     ? $translator
@@ -74,13 +73,13 @@ class GoogleTranslator implements TranslatorInterface
             } catch (\Exception $e) {
                 $this->break++;
                 $mins = rand(
-                    floor($this->called),
-                    floor($this->called * rand(2, 5))
+                    1,
+                    max(1, $this->called * rand(2, 5))
                 ) * $this->break;
                 sleep($mins * 60);
             }
         }
 
-        return $translated;
+        return $translated ?: null;
     }
 }
